@@ -85,11 +85,11 @@ h2(#installation). Installation
 
 h2(#prefs). Preferences / options
 
-* Service — _Default: none_ - The service you want to use to pull the quote;
-* Quote — _Default: unset_ - The quote in use (automatically filled after saving if a service is selected);
-* Source — _Default: unset_ - The source of the quote in use (not available in the existing services but can be filled manually);
-* Author — _Default: unset_ - The author of the quote (automatically filled after saving if a service is selected);
-* Cache time — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
+* *Service* — _Default: none_ - The service you want to use to pull the quote;
+* *Quote* — _Default: unset_ - The quote in use (automatically filled after saving if a service is selected);
+* *Source* — _Default: unset_ - The source of the quote in use (not available in the existing services but can be filled manually);
+* *Author* — _Default: unset_ - The author of the quote (automatically filled after saving if a service is selected);
+* *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 
 h2(#tags). Tags
 
