@@ -32,9 +32,8 @@ oui_quote_text => Quote
 oui_quote_cite => Source
 oui_quote_author => Author
 oui_quote_cache_time => Default cache time
-oui_quote_quotes_on_design => Random quote from Quotes on design
-oui_quote_they_said_so => Quote of the day from They said so
-oui_journetto_no_cache => No data cached
+oui_quote_quotes_on_design => Random quote from Quotes on Design
+oui_quote_they_said_so => Quote of the day from They Said So
 #@language fr-fr
 oui_quote => Citation
 oui_quote_services => Service
@@ -42,9 +41,8 @@ oui_quote_text => Citation
 oui_quote_cite => Source
 oui_quote_author => Author
 oui_quote_cache_time => Durée du cache par défaut
-oui_quote_quotes_on_design => Citation aléatoire de Quotes on design
-oui_quote_they_said_so => Citation du jour de They said so
-oui_journetto_no_cache => Pas de donnée en cache
+oui_quote_quotes_on_design => Citation aléatoire de Quotes on Design
+oui_quote_they_said_so => Citation du jour de They Said So
 EOT;
 
 if (!defined('txpinterface'))
@@ -56,7 +54,7 @@ if (0) {
 # --- BEGIN PLUGIN HELP ---
 h1. oui_quote
 
-Easily display your own quote or pull one from "Quotes on design":http://quotesondesign.com/ or "They said so":https://theysaidso.com/.
+Easily display your own quote or pull one from "Quotes on Design":http://quotesondesign.com/ or "They Said So":https://theysaidso.com/.
 
 h2. Table of contents
 
@@ -298,19 +296,19 @@ function oui_quote_inject_data() {
 	        	unset($_POST['oui_quote_text']);
 	        	unset($_POST['oui_quote_author']);
 	        	$feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
-				set_pref('oui_quote_text', $prefs['oui_quote_text'] = $feed->contents->quotes[0]->{'quote'});
-				set_pref('oui_quote_author', $prefs['oui_quote_author'] = $feed->contents->quotes[0]->{'author'});
+				set_pref('oui_quote_text', $feed->contents->quotes[0]->{'quote'});
+				set_pref('oui_quote_author', $feed->contents->quotes[0]->{'author'});
 	        	break;
 	        case 'quotes_on_design':
 	        	unset($_POST['oui_quote_text']);
 	        	unset($_POST['oui_quote_author']);
 				$feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
-				set_pref('oui_quote_text', $prefs['oui_quote_text'] = strip_tags($feed[0]->{'content'}));
-				set_pref('oui_quote_author', $prefs['oui_quote_author'] = $feed[0]->{'title'});
+				set_pref('oui_quote_text', strip_tags($feed[0]->{'content'}));
+				set_pref('oui_quote_author', $feed[0]->{'title'});
 	        	break;
 	    }
 	    unset($_POST['oui_quote_cache_set']);	    
-	    set_pref('oui_quote_cache_set', $prefs['oui_quote_cache_set'] = time());
+	    set_pref('oui_quote_cache_set', time());
 	}
 }
 
