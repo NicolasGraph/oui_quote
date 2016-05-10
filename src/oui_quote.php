@@ -64,7 +64,8 @@ h2. Table of contents
 * "Tags":#tags
 ** "oui_quote":#oui_quote
 ** "oui_quote_text":#oui_quote_text
-** "oui_quote_author":#oui_quote_image_author
+** "oui_quote_cite":#oui_quote_cite
+** "oui_quote_author":#oui_quote_author
 * "Examples":#examples
 ** "Single tag":#single_tag
 ** "Container tag":#container_tag
@@ -85,9 +86,10 @@ h2(#installation). Installation
 h2(#prefs). Preferences / options
 
 * Service — _Default: none_ - The service you want to use to pull the quote;
-* Quote — _Default: unset_ - The quote in use or the one you want to display if no service is selected;
-* Author — _Default: unset_ - The author of the quote;
-* Cache time — _Default: 60_ - Duration of the cache in minutes.
+* Quote — _Default: unset_ - The quote in use (automatically filled after saving if a service is selected);
+* Source — _Default: unset_ - The source of the quote in use (not available in the existing services but can be filled manually);
+* Author — _Default: unset_ - The author of the quote (automatically filled after saving if a service is selected);
+* Cache time — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 
 h2(#tags). Tags
 
@@ -107,14 +109,14 @@ h4. Attributes
 
 _(Alphabetical order)_
 
-* @class="…"@ – _Default: oui_quote_images_ - The css class to apply to the HTML tag assigned to @wraptag@.
+* @class="…"@ – _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@.
 * @label="…"@ – _Default: unset_ - The label used to entitled the generated content.
 * @labeltag="…"@ - _Default: unset_ - The HTML tag used around the value assigned to @label@.
-* @wraptag="…"@ - _Default: ul_ - The HTML tag to use around the generated content.
+* @wraptag="…"@ - _Default: blockquote_ - The HTML tag to use around the generated content.
 
 h3(#oui_quote_text). oui_quote_text
 
-Displays the text of the quote.
+Displays the body of the quote.
 
 bc. <txp:oui_quote_text />
 
@@ -123,7 +125,7 @@ h4. Attributes
 _(Alphabetical order)_
 
 * @class="…"@ — _Default: unset_ - The css class to apply to the @img@ HTML tag or to the HTML tag assigned to @wraptag@.
-* @wraptag="…"@ — _Default: unset_ - The HTML tag to use around the generated content.
+* @wraptag="…"@ — _Default: p_ - The HTML tag to use around the generated content.
 
 h3(#oui_quote_cite). oui_quote_cite
 
@@ -136,7 +138,7 @@ h4. Attributes
 _(Alphabetical order)_
 
 * @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
-* @wraptag="…"@ — _Default: unset_ - The HTML tag to use around the generated content.
+* @wraptag="…"@ — _Default: cite_ - The HTML tag to use around the generated content.
 
 h3(#oui_quote_author). oui_quote_author
 
@@ -149,7 +151,7 @@ h4. Attributes
 _(Alphabetical order)_
 
 * @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
-* @wraptag="…"@ — _Default: unset_ - The HTML tag to use around the generated content.
+* @wraptag="…"@ — _Default: span_ - The HTML tag to use around the generated content.
 
 h2(#examples). Examples
 
@@ -177,6 +179,7 @@ bc. <txp:oui_quote>
 h2(#author). Author
 
 "Nicolas Morand":https://github.com/NicolasGraph
+_Thank you to the "Textpattern core team":http://textpattern.com/patrons and "the CMS community":http://forum.textpattern.com/._ 
 
 h2(#licence). Licence
 
