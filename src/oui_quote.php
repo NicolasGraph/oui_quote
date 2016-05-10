@@ -11,7 +11,7 @@ $plugin['description'] = 'Display a custom quote or pull one from some web servi
 
 $plugin['order'] = 5;
 
-$plugin['type'] = 1;
+$plugin['type'] = 5;
 
 // Plugin 'flags' signal the presence of optional capabilities to the core plugin loader.
 // Use an appropriately OR-ed combination of these flags.
@@ -34,6 +34,7 @@ oui_quote_author => Author
 oui_quote_cache_time => Default cache time
 oui_quote_quotes_on_design => Random quote from Quotes on design
 oui_quote_they_said_so => Quote of the day from They said so
+oui_journetto_no_cache => No data cached
 #@language fr-fr
 oui_quote => Citation
 oui_quote_services => Service
@@ -43,6 +44,7 @@ oui_quote_author => Author
 oui_quote_cache_time => Durée du cache par défaut
 oui_quote_quotes_on_design => Citation aléatoire de Quotes on design
 oui_quote_they_said_so => Citation du jour de They said so
+oui_journetto_no_cache => Pas de donnée en cache
 EOT;
 
 if (!defined('txpinterface'))
@@ -85,9 +87,9 @@ h2(#installation). Installation
 h2(#prefs). Preferences / options
 
 * Service — _Default: none_ - The service you want to use to pull the quote;
-* Quote — _Default: unset_ - The quote in use;
-* Author — _Default: unset_ - The quote author;
-* Cache time — _Default: 0_ - Duration of the cache in minutes.
+* Quote — _Default: unset_ - The quote in use or the one you want to display if no service is selected;
+* Author — _Default: unset_ - The author of the quote;
+* Cache time — _Default: 60_ - Duration of the cache in minutes.
 
 h2(#tags). Tags
 
@@ -107,7 +109,6 @@ h4. Attributes
 
 _(Alphabetical order)_
 
-* @break="…"@ - _Default: li_ - The HTML tag used around each generated image.
 * @class="…"@ – _Default: oui_quote_images_ - The css class to apply to the HTML tag assigned to @wraptag@.
 * @label="…"@ – _Default: unset_ - The label used to entitled the generated content.
 * @labeltag="…"@ - _Default: unset_ - The HTML tag used around the value assigned to @label@.
@@ -115,7 +116,7 @@ _(Alphabetical order)_
 
 h3(#oui_quote_text). oui_quote_text
 
-Displays the quote without the author.
+Displays the text of the quote.
 
 bc. <txp:oui_quote_text />
 
@@ -124,6 +125,19 @@ h4. Attributes
 _(Alphabetical order)_
 
 * @class="…"@ — _Default: unset_ - The css class to apply to the @img@ HTML tag or to the HTML tag assigned to @wraptag@.
+* @wraptag="…"@ — _Default: unset_ - The HTML tag to use around the generated content.
+
+h3(#oui_quote_cite). oui_quote_cite
+
+Displays the source of the quote if available.
+
+bc. <txp:oui_quote_cite />
+
+h4. Attributes
+
+_(Alphabetical order)_
+
+* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
 * @wraptag="…"@ — _Default: unset_ - The HTML tag to use around the generated content.
 
 h3(#oui_quote_author). oui_quote_author
@@ -145,10 +159,20 @@ h3(#single_tag). Example 1: single tag use
 
 bc. <txp:oui_quote />
 
+will return:
+
+bc.. <blockquote>
+    <p>The quote.</p>
+    <footer>
+        <span>The author</span>, <cite>The reference</cite>
+    </footer>    
+</blockquote>
+
 h3(#container_tag). Example 2: container tag use
 
 bc. <txp:oui_quote>
     <txp:oui_quote_text />
+    <txp:oui_quote_cite />
     <txp:oui_quote_author />
 </txp:oui_quote>
 
@@ -181,6 +205,7 @@ if (txpinterface === 'admin') {
     register_callback('oui_quote_welcome', 'plugin_lifecycle.oui_quote');
     register_callback('oui_quote_install', 'prefs', null, 1);
     register_callback('oui_quote_options', 'plugin_prefs.oui_quote', null, 1);
+    register_callback('oui_quote_inject_data', 'prefs', 'prefs_save', 1);
 }
 
 function oui_quote_welcome($evt, $stp)
@@ -238,9 +263,9 @@ function oui_quote_install() {
     if (get_pref('oui_quote_cache_time', null) === null) {
         if (defined('PREF_PLUGIN')) {
             // Txp 4.6
-            set_pref('oui_quote_cache_time', '0', 'oui_quote', PREF_PLUGIN, 'text_input', 50);
+            set_pref('oui_quote_cache_time', '60', 'oui_quote', PREF_PLUGIN, 'text_input', 50);
         } else {
-            set_pref('oui_quote_cache_time', '0', 'oui_quote', PREF_ADVANCED, 'text_input', 50);
+            set_pref('oui_quote_cache_time', '60', 'oui_quote', PREF_ADVANCED, 'text_input', 50);
         }
     }
     if (get_pref('oui_instagram_cache_set', null) === null) {
@@ -250,7 +275,7 @@ function oui_quote_install() {
 
 function oui_quote_sercices_select($name, $val) {
     $vals = array('quotes_on_design'=> gTxt('oui_quote_quotes_on_design'), 'they_said_so'=> gTxt('oui_quote_they_said_so'));
-    return selectInput($name, $vals, $val, '1', '1');
+    return selectInput($name, $vals, $val, '1');
 }
 
 function oui_quote_options() {
@@ -262,11 +287,37 @@ function oui_quote_options() {
     header('Location: ' . $link);
 }
 
+function oui_quote_inject_data() {
+	
+	$cache_time = $_POST['oui_quote_cache_time'];
+    $needquery = (($_POST['oui_quote_services'] !== get_pref('oui_quote_services')) || (!get_pref('oui_quote_text') || (time() - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false);
+
+    if ($needquery) {
+	    switch ($_POST['oui_quote_services']) {
+	        case 'they_said_so':
+	        	unset($_POST['oui_quote_text']);
+	        	unset($_POST['oui_quote_author']);
+	        	$feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
+				set_pref('oui_quote_text', $prefs['oui_quote_text'] = $feed->contents->quotes[0]->{'quote'});
+				set_pref('oui_quote_author', $prefs['oui_quote_author'] = $feed->contents->quotes[0]->{'author'});
+	        	break;
+	        case 'quotes_on_design':
+	        	unset($_POST['oui_quote_text']);
+	        	unset($_POST['oui_quote_author']);
+				$feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
+				set_pref('oui_quote_text', $prefs['oui_quote_text'] = strip_tags($feed[0]->{'content'}));
+				set_pref('oui_quote_author', $prefs['oui_quote_author'] = $feed[0]->{'title'});
+	        	break;
+	    }
+	    unset($_POST['oui_quote_cache_set']);	    
+	    set_pref('oui_quote_cache_set', $prefs['oui_quote_cache_set'] = time());
+	}
+}
+
 function oui_quote($atts, $thing=null) {
     global $quote, $cite, $author;
 
     extract(lAtts(array(
-        'cache_time' => get_pref('oui_quote_cache_time'),
         'wraptag'    => 'blockquote',
         'class'      => '',
         'label'      => '',
@@ -274,25 +325,21 @@ function oui_quote($atts, $thing=null) {
     ),$atts));
 
     // Prepare cache variables
-    $needquery = ((!get_pref('oui_quote_text')) || (time() - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false;
+    $cache_time = get_pref('oui_quote_cache_time');
+    $needquery = ((!get_pref('oui_quote_text') || (time() - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false);
 
     // Cache_time is not set, or a new cache file is needed; throw a new request
     if ($needquery) {
-
 	    switch (get_pref('oui_quote_services')) {
 	        case 'they_said_so':
 	        	$feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
 				$quote = $feed->contents->quotes[0]->{'quote'};
 				$author = $feed->contents->quotes[0]->{'author'};
-				set_pref('oui_quote_text', $quote);
-				set_pref('oui_quote_author', $author);
 	        	break;
 	        case 'quotes_on_design':
 				$feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
 				$quote = strip_tags($feed[0]->{'content'});
 				$author = $feed[0]->{'title'};
-				set_pref('oui_quote_text', $quote);
-				set_pref('oui_quote_author', $author);
 	        	break;
 			default:
 				$quote = get_pref('oui_quote_text');
@@ -300,29 +347,9 @@ function oui_quote($atts, $thing=null) {
 				$author = get_pref('oui_quote_author');
 				break;	    
 		}
-
-        // …and check the result
-        if(isset($quote)){
-
-            // single tag use
-            if ($thing === null) {
-
-                $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.($cite ? ', <cite>'.$cite.'</cite>' : '').'</footer>';
-                $out = (($label) ? doLabel($label, $labeltag) : '').\n
-                       .doTag($data, $wraptag, $class);
-
-            // Conatiner tag use
-            } else {
-                $data = parse($thing);
-                $out = (($label) ? doLabel($label, $labeltag) : '').\n
-                       .doTag($data, $wraptag, $class);
-            }
-            
-        } else {
-            trigger_error("oui_quote was unable to get any content.");
-            return;
-        }
+		update_lastmod();
     }
+ 
     // Cache file needed
     if ($needquery && $cache_time > 0) {
         // Time stamp and write the new cache files and return
@@ -335,14 +362,30 @@ function oui_quote($atts, $thing=null) {
     if (!$needquery && $cache_time > 0) {
         $quote = get_pref('oui_quote_text');
         $author = get_pref('oui_quote_author');
+    }
 
-        $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.($cite ? ', <cite>'.$cite.'</cite>' : '').'</footer>';
-        $cache_out = (($label) ? doLabel($label, $labeltag) : '').\n
-               .doTag($data, $wraptag, $class);      
-        return $cache_out;
-    // or return the query result
-    } else {
+    // …and check the result
+    if(isset($quote)){
+
+        // single tag use
+        if ($thing === null) {
+
+            $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.($cite ? ', <cite>'.$cite.'</cite>' : '').'</footer>';
+            $out = (($label) ? doLabel($label, $labeltag) : '').\n
+                   .doTag($data, $wraptag, $class);
+
+        // Conatiner tag use
+        } else {
+            $data = parse($thing);
+            $out = (($label) ? doLabel($label, $labeltag) : '').\n
+                   .doTag($data, $wraptag, $class);
+        }
+        
         return $out;
+        
+    } else {
+        trigger_error("oui_quote was unable to get any content.");
+        return;
     }
 }
 
