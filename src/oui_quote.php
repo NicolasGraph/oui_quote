@@ -290,10 +290,7 @@ function oui_quote_options() {
 
 function oui_quote_inject_data() {
 	
-	$cache_time = $_POST['oui_quote_cache_time'];
-    $needquery = (($_POST['oui_quote_services'] !== get_pref('oui_quote_services')) || (!get_pref('oui_quote_text') || (time() - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false);
-
-    if ($needquery) {
+    if (($_POST['oui_quote_services'] !== get_pref('oui_quote_services')) || (!get_pref('oui_quote_text') || (time() - get_pref('oui_quote_cache_set')) > ($_POST['oui_quote_cache_time'] * 60))) {
 	    switch ($_POST['oui_quote_services']) {
 	        case 'they_said_so':
 	        	unset($_POST['oui_quote_text']);
@@ -349,45 +346,32 @@ function oui_quote($atts, $thing=null) {
 				break;	    
 		}
 		update_lastmod();
-    }
- 
-    // Cache file needed
-    if ($needquery && $cache_time > 0) {
-        // Time stamp and write the new cache files and return
-        set_pref('oui_quote_cache_set', time());
-        set_pref('oui_quote_text', $quote);
-        set_pref('oui_quote_author', $author);
-    }
 
-    // Read cache
-    if (!$needquery && $cache_time > 0) {
+	    // Cache file needed
+	    if ($cache_time > 0) {
+	        // Time stamp and write the new cache files and return
+	        set_pref('oui_quote_cache_set', time());
+	        set_pref('oui_quote_text', $quote);
+	        set_pref('oui_quote_author', $author);
+	    }
+    } else if (!$needquery && $cache_time > 0) {
         $quote = get_pref('oui_quote_text');
         $author = get_pref('oui_quote_author');
     }
 
-    // …and check the result
-    if(isset($quote)){
-
-        // single tag use
-        if ($thing === null) {
-
-            $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.($cite ? ', <cite>'.$cite.'</cite>' : '').'</footer>';
-            $out = (($label) ? doLabel($label, $labeltag) : '').\n
-                   .doTag($data, $wraptag, $class);
-
-        // Conatiner tag use
-        } else {
-            $data = parse($thing);
-            $out = (($label) ? doLabel($label, $labeltag) : '').\n
-                   .doTag($data, $wraptag, $class);
-        }
-        
-        return $out;
-        
+    // single tag use
+    if ($thing === null) {
+        $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.($cite ? ', <cite>'.$cite.'</cite>' : '').'</footer>';
+        $out = (($label) ? doLabel($label, $labeltag) : '').\n
+               .doTag($data, $wraptag, $class);
+    // Conatiner tag use
     } else {
-        trigger_error("oui_quote was unable to get any content.");
-        return;
+        $data = parse($thing);
+        $out = (($label) ? doLabel($label, $labeltag) : '').\n
+               .doTag($data, $wraptag, $class);
     }
+    
+    return $out;
 }
 
 function oui_quote_text($atts) {
