@@ -35,7 +35,7 @@ oui_quote_link => Link
 oui_quote_cache_time => Cache time in minutes
 oui_quote_quotes_on_design => Random quote from Quotes on Design (en)
 oui_quote_they_said_so => Quote of the day from They Said So (en)
-oui_quote_dicocitations => Quote of the day from Le Monde (fr)
+oui_quote_le_monde => Quote of the day from Le Monde (fr)
 oui_quote_le_figaro => Quote of the day from Le Figaro (fr)
 #@language fr-fr
 oui_quote => Citation
@@ -47,7 +47,7 @@ oui_quote_link => Lien
 oui_quote_cache_time => Durée du cache en minutes
 oui_quote_quotes_on_design => Citation aléatoire de Quotes on Design (en)
 oui_quote_they_said_so => Citation du jour de They Said So (en)
-oui_quote_dicocitations => Citation du jour du Monde (fr)
+oui_quote_le_monde => Citation du jour du Monde (fr)
 oui_quote_le_figaro => Citation du jour du Figaro (fr)
 EOT;
 
@@ -63,7 +63,7 @@ h1. oui_quote
 Easily display your own quote or pull one from the following services:
 * "Quotes on Design":http://quotesondesign.com/ (en);
 * "They Said So":https://theysaidso.com/ (en);
-* "Le Monde":http://dicocitations.lemonde.fr/ (fr);
+* "Le Monde":http://le_monde.lemonde.fr/ (fr);
 * "Le Figaro":http://evene.lefigaro.fr/citations (fr).
 
 h2. Table of contents
@@ -263,6 +263,9 @@ function oui_quote_install() {
             set_pref('oui_quote_services', '', 'oui_quote', PREF_ADVANCED, 'oui_quote_sercices_select', 10);
         }
     }
+    if (get_pref('oui_instagram_service', null) === null) {
+        set_pref('oui_instagram_service', '', 'oui_instagram', PREF_HIDDEN, 'text_input', 70);
+    }
     if (get_pref('oui_quote_text', null) === null) {
         if (defined('PREF_PLUGIN')) {
             set_pref('oui_quote_text', '', 'oui_quote', PREF_PLUGIN, 'text_input', 20);
@@ -307,7 +310,7 @@ function oui_quote_install() {
  * Set Services pref function using selectInput()
  */
 function oui_quote_sercices_select($name, $val) {
-    $vals = array('quotes_on_design' => gTxt('oui_quote_quotes_on_design'), 'they_said_so' => gTxt('oui_quote_they_said_so'), 'dicocitations' => gTxt('oui_quote_dicocitations'), 'le_figaro' => gTxt('oui_quote_le_figaro'));
+    $vals = array('quotes_on_design' => gTxt('oui_quote_quotes_on_design'), 'they_said_so' => gTxt('oui_quote_they_said_so'), 'le_monde' => gTxt('oui_quote_le_monde'), 'le_figaro' => gTxt('oui_quote_le_figaro'));
     return selectInput($name, $vals, $val, '1', '1');
 }
 
@@ -341,6 +344,7 @@ function oui_quote_inject_data() {
 				set_pref('oui_quote_cite', '');
 				set_pref('oui_quote_author', $feed->contents->quotes[0]->{'author'});
 				set_pref('oui_quote_link', '');
+				set_pref('oui_quote_service', 'They Said So');
 	        	break;
 	        case 'quotes_on_design':
 	        	unset($_POST['oui_quote_text'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_link']);
@@ -348,9 +352,10 @@ function oui_quote_inject_data() {
 				set_pref('oui_quote_text', strip_tags($feed[0]->{'content'}));
 				set_pref('oui_quote_cite', '');
 				set_pref('oui_quote_author', $feed[0]->{'title'});
-				set_pref('oui_quote_link', $feed[0]->{'link'});				
+				set_pref('oui_quote_link', $feed[0]->{'link'});
+				set_pref('oui_quote_service', 'Quotes on Design');
 	        	break;
-	        case 'dicocitations':
+	        case 'le_monde':
 	        	unset($_POST['oui_quote_text'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_link']);
 				$feed = simplexml_load_string(file_get_contents('http://dicocitations.lemonde.fr/xml-rss2.php'));
 				set_pref('oui_quote_link', $feed->channel->item->link);
@@ -358,6 +363,7 @@ function oui_quote_inject_data() {
 				set_pref('oui_quote_text', trim($feed[0]));
 				set_pref('oui_quote_cite', trim($feed[2]));
 				set_pref('oui_quote_author', trim($feed[1]));
+				set_pref('oui_quote_service', 'Le Monde');
 	        	break;
 	        case 'le_figaro':
 	        	unset($_POST['oui_quote_text'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_link']);
@@ -367,6 +373,7 @@ function oui_quote_inject_data() {
 				set_pref('oui_quote_text', $feed[1]);
 				set_pref('oui_quote_cite', '');
 				set_pref('oui_quote_author', $feed[0]);
+				set_pref('oui_quote_service', 'Le Figaro');
 	        	break;	        	
 	    }
 	    unset($_POST['oui_quote_cache_set']);	    
@@ -399,20 +406,20 @@ function oui_quote($atts, $thing=null) {
     if ($needquery) {
 	    switch (get_pref('oui_quote_services')) {
 	        case 'they_said_so':
+	        	$service = 'They Said So';
 	        	$feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
 				$quote = $feed->contents->quotes[0]->{'quote'};
-				$cite = '';
 				$author = $feed->contents->quotes[0]->{'author'};
-				$link = '';
 	        	break;
 	        case 'quotes_on_design':
+	        	$service = 'Quotes on Design';
 				$feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
 				$quote = strip_tags($feed[0]->{'content'});
-				$cite = '';
 				$author = $feed[0]->{'title'};
 				$link = $feed[0]->{'link'};
 	        	break;
-	        case 'dicocitations':
+	        case 'le_monde':
+	        	$service = 'Le Monde';
 				$feed = simplexml_load_string(file_get_contents('http://dicocitations.lemonde.fr/xml-rss2.php'));
 				$feed = preg_split( "/(\[|\])/", strip_tags($feed->channel->item->description));
 				$quote = $feed[0];
@@ -421,10 +428,10 @@ function oui_quote($atts, $thing=null) {
 				$link = $feed->channel->item->link;
 	        	break;
 	        case 'le_figaro':
+	        	$service = 'Le Figaro';
 				$feed = simplexml_load_string(file_get_contents('http://evene.lefigaro.fr/rss/citation_jour.xml'));
 				$feed = preg_split( "/ - /", strip_tags($feed->channel->item->title));
 				$quote = $feed[1];
-				$cite = '';
 				$author = $feed[0];
 				$link = $feed->channel->item->link;
 	        	break;	
@@ -441,9 +448,10 @@ function oui_quote($atts, $thing=null) {
 	        // Time stamp and store the new data in the prefs.
 	        set_pref('oui_quote_cache_set', time());
 	        set_pref('oui_quote_text', $quote);
-	        set_pref('oui_quote_text', $cite);
 	        set_pref('oui_quote_author', $author);
-	        set_pref('oui_quote_link', $link);
+	        if ($cite) { set_pref('oui_quote_text', $cite); }
+	        if ($link) { set_pref('oui_quote_link', $link); }
+	        if ($service) { set_pref('oui_quote_service', $service); }
 	    }
 
 	// Cache is set and is not outdated, data exists.  
@@ -452,11 +460,12 @@ function oui_quote($atts, $thing=null) {
         $cite = get_pref('oui_quote_cite');
         $author = get_pref('oui_quote_author');
         $link = get_pref('oui_quote_link');
+        $service = get_pref('oui_quote_service');
     }
 
     // single tag use.
     if ($thing === null) {
-        $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.($cite ? n.'<cite>'.$cite.'</cite>' : '').'</footer>';
+        $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.($cite ? n.'<cite>'.$cite.' via '.href($service, $link).'</cite>' : '').'</footer>';
         $out = (($label) ? doLabel($label, $labeltag) : '').\n
                .doTag($data, $wraptag, $class);
     // Conatiner tag use.
