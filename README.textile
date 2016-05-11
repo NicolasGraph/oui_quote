@@ -1,10 +1,12 @@
 h1. oui_quote <img src="https://img.shields.io/badge/textpattern-4.5+-brightgreen.svg" />
 
-!In process: this plugin is not officially released yet.
+*!In process:* this plugin is not officially released yet.
 
-Easily display your own quote or pull one from "Quotes on Design":http://quotesondesign.com/ or "They Said So":https://theysaidso.com/.
-
-"Download":https://github.com/NicolasGraph/oui_disclaimer/releases | "Donate":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=PREHX3MZMXEUN
+Easily display your own quote or pull one from the following services:
+* "Quotes on Design":http://quotesondesign.com/;
+* "They Said So":https://theysaidso.com/;
+* "Le Monde":http://dicocitations.lemonde.fr/
+* "Le Figaro":http://evene.lefigaro.fr/citations
 
 h2. Table of contents
 
@@ -37,7 +39,7 @@ h2(#prefs). Preferences / options
 
 * *Service* — _Default: none_ - The service you want to use to pull the quote;
 * *Quote* — _Default: unset_ - The quote in use (automatically filled after saving if a service is selected);
-* *Source* — _Default: unset_ - The source of the quote in use (not available in the existing services but can be filled manually);
+* *Source* — _Default: unset_ - The source of the quote in use (automatically filled by Le Monde only);
 * *Author* — _Default: unset_ - The author of the quote (automatically filled after saving if a service is selected);
 * *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 

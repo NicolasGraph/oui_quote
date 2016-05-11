@@ -58,7 +58,11 @@ if (0) {
 # --- BEGIN PLUGIN HELP ---
 h1. oui_quote
 
-Easily display your own quote or pull one from "Quotes on Design":http://quotesondesign.com/ or "They Said So":https://theysaidso.com/.
+Easily display your own quote or pull one from the following services:
+* "Quotes on Design":http://quotesondesign.com/;
+* "They Said So":https://theysaidso.com/;
+* "Le Monde":http://dicocitations.lemonde.fr/
+* "Le Figaro":http://evene.lefigaro.fr/citations
 
 h2. Table of contents
 
