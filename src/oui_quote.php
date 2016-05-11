@@ -59,10 +59,10 @@ if (0) {
 h1. oui_quote
 
 Easily display your own quote or pull one from the following services:
-* "Quotes on Design":http://quotesondesign.com/;
-* "They Said So":https://theysaidso.com/;
-* "Le Monde":http://dicocitations.lemonde.fr/
-* "Le Figaro":http://evene.lefigaro.fr/citations
+* "Quotes on Design":http://quotesondesign.com/ (en);
+* "They Said So":https://theysaidso.com/ (en);
+* "Le Monde":http://dicocitations.lemonde.fr/ (fr);
+* "Le Figaro":http://evene.lefigaro.fr/citations (fr).
 
 h2. Table of contents
 
@@ -94,9 +94,9 @@ h2(#installation). Installation
 h2(#prefs). Preferences / options
 
 * *Service* — _Default: none_ - The service you want to use to pull the quote;
-* *Quote* — _Default: unset_ - The quote in use (automatically filled after saving if a service is selected);
+* *Quote* — _Default: unset_ - The quote in use (automatically filled if a service is selected);
 * *Source* — _Default: unset_ - The source of the quote in use (automatically filled by Le Monde only);
-* *Author* — _Default: unset_ - The author of the quote (automatically filled after saving if a service is selected);
+* *Author* — _Default: unset_ - The author of the quote (automatically filled if a service is selected);
 * *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 
 h2(#tags). Tags
