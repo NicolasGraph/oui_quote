@@ -4,10 +4,10 @@ $plugin['name'] = 'oui_quote';
 
 $plugin['allow_html_help'] = 0;
 
-$plugin['version'] = '0.1.0-beta';
+$plugin['version'] = '0.1.0';
 $plugin['author'] = 'Nicolas Morand';
 $plugin['author_uri'] = 'https://github.com/NicolasGraph';
-$plugin['description'] = 'Display a custom quote or pull one from some web services';
+$plugin['description'] = 'Display a custom quote or pull one from a web service';
 
 $plugin['order'] = 5;
 
@@ -28,10 +28,10 @@ $plugin['textpack'] = <<< EOT
 #@language en-gb
 oui_quote => Quote
 oui_quote_services => Service
-oui_quote_text => Quote
-oui_quote_cite => Source
+oui_quote_body => Quote
+oui_quote_cite => Reference
 oui_quote_author => Author
-oui_quote_link => Link
+oui_quote_url => Url
 oui_quote_cache_time => Cache time in minutes
 oui_quote_quotes_on_design => Random quote from Quotes on Design (en)
 oui_quote_service_quotes_on_design => Quotes on Design
@@ -44,10 +44,10 @@ oui_quote_service_le_figaro => Le Figaro
 #@language fr-fr
 oui_quote => Citation
 oui_quote_services => Service
-oui_quote_text => Citation
-oui_quote_cite => Source
+oui_quote_body => Citation
+oui_quote_cite => Référence
 oui_quote_author => Author
-oui_quote_link => Lien
+oui_quote_url => Url
 oui_quote_cache_time => Durée du cache en minutes
 oui_quote_quotes_on_design => Citation aléatoire de Quotes on Design (en)
 oui_quote_service_quotes_on_design => Quotes on Design
@@ -69,10 +69,10 @@ if (0) {
 h1. oui_quote
 
 Easily display your own quote or pull one from the following services:
+* "Le Figaro":http://evene.lefigaro.fr/citations (fr).
+* "Le Monde":http://le_monde.lemonde.fr/ (fr);
 * "Quotes on Design":http://quotesondesign.com/ (en);
 * "They Said So":https://theysaidso.com/ (en);
-* "Le Monde":http://le_monde.lemonde.fr/ (fr);
-* "Le Figaro":http://evene.lefigaro.fr/citations (fr).
 
 h2. Table of contents
 
@@ -81,9 +81,9 @@ h2. Table of contents
 * "Preferences":#prefs
 * "Tags":#tags
 ** "oui_quote":#oui_quote
-** "oui_quote_text":#oui_quote_text
-** "oui_quote_cite":#oui_quote_cite
+** "oui_quote_body":#oui_quote_body
 ** "oui_quote_author":#oui_quote_author
+** "oui_quote_cite":#oui_quote_cite
 * "Examples":#examples
 ** "Single tag":#single_tag
 ** "Container tag":#container_tag
@@ -105,15 +105,14 @@ h2(#prefs). Preferences / options
 
 * *Service* — _Default: none_ - The service you want to use to pull the quote;
 * *Quote* — _Default: unset_ - The quote in use (automatically filled if a service is selected);
-* *Source* — _Default: unset_ - The source of the quote in use (automatically filled by Le Monde only);
+* *Reference* — _Default: unset_ - The reference of the quote in use (automatically filled by Le Monde only);
 * *Author* — _Default: unset_ - The author of the quote (automatically filled if a service is selected);
+* *Url* — _Default: unset_ - The url of the quote source (automatically filled if a service is selected);
 * *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 
 h2(#tags). Tags
 
 h3(#oui_quote). oui_quote
-
-Displays the quote.
 
 bc. <txp:oui_quote />
 
@@ -123,6 +122,8 @@ bc. <txp:oui_quote>
 […]
 </txp:oui_quote>
 
+Displays the quote.
+
 h4. Attributes
 
 _(Alphabetical order)_
@@ -130,39 +131,27 @@ _(Alphabetical order)_
 * @class="…"@ – _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@.
 * @label="…"@ – _Default: unset_ - The label used to entitled the generated content.
 * @labeltag="…"@ - _Default: unset_ - The HTML tag used around the value assigned to @label@.
-* @wraptag="…"@ - _Default: blockquote_ - The HTML tag to use around the generated content.
+* @service="…"@ - _Default: 1 if a service is selected, or 0_ - display the name/link of/to the service from which the quote was pulled;
+* @wraptag="…"@ - _Default: figure_ (see "here":http://alistapart.com/blog/post/more-thoughts-about-blockquotes-than-are-strictly-required) - The HTML tag to use around the generated content.
 
-h3(#oui_quote_text). oui_quote_text
+h3(#oui_quote_body). oui_quote_body
+
+bc. <txp:oui_quote_body />
 
 Displays the body of the quote.
-
-bc. <txp:oui_quote_text />
 
 h4. Attributes 
 
 _(Alphabetical order)_
 
 * @class="…"@ — _Default: unset_ - The css class to apply to the @img@ HTML tag or to the HTML tag assigned to @wraptag@.
-* @wraptag="…"@ — _Default: p_ - The HTML tag to use around the generated content.
-
-h3(#oui_quote_cite). oui_quote_cite
-
-Displays the source of the quote if available.
-
-bc. <txp:oui_quote_cite />
-
-h4. Attributes
-
-_(Alphabetical order)_
-
-* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
-* @wraptag="…"@ — _Default: cite_ - The HTML tag to use around the generated content.
+* @wraptag="…"@ — _Default: blockquote_ - The HTML tag to use around the generated content.
 
 h3(#oui_quote_author). oui_quote_author
 
-Displays the author.
-
 bc. <txp:oui_quote_author />
+
+Displays the author.
 
 h4. Attributes
 
@@ -171,33 +160,54 @@ _(Alphabetical order)_
 * @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
 * @wraptag="…"@ — _Default: span_ - The HTML tag to use around the generated content.
 
+h3(#oui_quote_cite). oui_quote_cite
+
+bc. <txp:oui_quote_cite />
+
+Displays the refernce of the quote and the service from which it was pulled.
+If an the url preference is filled, it will wrap the service or the source into a link.
+
+h4. Attributes
+
+_(Alphabetical order)_
+
+* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
+* @service="…"@ - _Default: inherited from the container tag - display the name/link of the service from which the quote was pulled;
+* @wraptag="…"@ — _Default: cite_ - The HTML tag to use around the generated content.
+
 h2(#examples). Examples
 
 h3(#single_tag). Example 1: single tag use
 
-bc. <txp:oui_quote />
+bc. <txp:oui_quote label="Citation du jour" labeltag="h1" />
 
-will return:
+when used with Le Monde will return:
 
-bc.. <blockquote>
-    <p>The quote.</p>
-    <footer>
-        <span>The author</span>, <cite>The reference</cite>
-    </footer>    
-</blockquote>
+bc.. <h1>Citation du jour</h1>
+<figure>
+    <p>Ce n'est pas parce-que vous êtes nombreux à avoir tort que vous avez raison.</p>
+    <figcaption>
+        <span>Bernard Werber</span>
+        <cite>Le Mystère des dieux (2007) via <a href="http://dicocitations.lemonde.fr/item-5133.html">Le Monde</a></cite>
+    </figcation>    
+</figure>
 
 h3(#container_tag). Example 2: container tag use
 
-bc. <txp:oui_quote>
-    <txp:oui_quote_text />
-    <txp:oui_quote_cite />
-    <txp:oui_quote_author />
+The previous example with the use of a container tag would look like:
+
+bc. <txp:oui_quote label="Citation du jour" labeltag="h1">
+    <txp:oui_quote_body />
+    <figcaption>
+        <txp:oui_quote_author />
+        <txp:oui_quote_cite />
+    </figcaption>
 </txp:oui_quote>
 
 h2(#author). Author
 
 "Nicolas Morand":https://github.com/NicolasGraph
-_Thank you to the "Textpattern core team":http://textpattern.com/patrons and "the CMS community":http://forum.textpattern.com/._ 
+_Thank you to the Textpattern community and the core team._ 
 
 h2(#licence). Licence
 
@@ -215,7 +225,7 @@ This plugin is distributed under "GPLv2":http://www.gnu.org/licenses/gpl-2.0.fr.
 if (class_exists('\Textpattern\Tag\Registry')) {
     Txp::get('\Textpattern\Tag\Registry')
         ->register('oui_quote')
-        ->register('oui_quote_text')
+        ->register('oui_quote_body')
         ->register('oui_quote_cite')
         ->register('oui_quote_author');
 }
@@ -271,11 +281,11 @@ function oui_quote_install() {
             set_pref('oui_quote_services', '', 'oui_quote', PREF_ADVANCED, 'oui_quote_sercices_select', 10);
         }
     }
-    if (get_pref('oui_quote_text', null) === null) {
+    if (get_pref('oui_quote_body', null) === null) {
         if (defined('PREF_PLUGIN')) {
-            set_pref('oui_quote_text', '', 'oui_quote', PREF_PLUGIN, 'text_input', 20);
+            set_pref('oui_quote_body', '', 'oui_quote', PREF_PLUGIN, 'text_input', 20);
         } else {
-            set_pref('oui_quote_text', '', 'oui_quote', PREF_ADVANCED, 'text_input', 20);
+            set_pref('oui_quote_body', '', 'oui_quote', PREF_ADVANCED, 'text_input', 20);
         }
     }
     if (get_pref('oui_quote_author', null) === null) {
@@ -292,11 +302,11 @@ function oui_quote_install() {
             set_pref('oui_quote_author', '', 'oui_quote', PREF_ADVANCED, 'text_input', 40);
         }
     }
-    if (get_pref('oui_quote_link', null) === null) {
+    if (get_pref('oui_quote_url', null) === null) {
         if (defined('PREF_PLUGIN')) {
-            set_pref('oui_quote_link', '', 'oui_quote', PREF_PLUGIN, 'text_input', 50);
+            set_pref('oui_quote_url', '', 'oui_quote', PREF_PLUGIN, 'text_input', 50);
         } else {
-            set_pref('oui_quote_link', '', 'oui_quote', PREF_ADVANCED, 'text_input', 50);
+            set_pref('oui_quote_url', '', 'oui_quote', PREF_ADVANCED, 'text_input', 50);
         }
     }
     if (get_pref('oui_quote_cache_time', null) === null) {
@@ -345,39 +355,39 @@ function oui_quote_options() {
  */
 function oui_quote_inject_data() {
 	
-    if (($_POST['oui_quote_services'] !== get_pref('oui_quote_services')) || (!get_pref('oui_quote_text') || (time() - get_pref('oui_quote_cache_set')) > ($_POST['oui_quote_cache_time'] * 60))) {
+    if (($_POST['oui_quote_services'] !== get_pref('oui_quote_services')) || (!get_pref('oui_quote_body') || (time() - get_pref('oui_quote_cache_set')) > ($_POST['oui_quote_cache_time'] * 60))) {
 	    switch ($_POST['oui_quote_services']) {
 	        case 'oui_quote_service_they_said_so':
-	        	unset($_POST['oui_quote_text'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_link']);
+	        	unset($_POST['oui_quote_body'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_url']);
 	        	$feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
-				set_pref('oui_quote_text', $feed->contents->quotes[0]->{'quote'});
+				set_pref('oui_quote_body', $feed->contents->quotes[0]->{'quote'});
 				set_pref('oui_quote_cite', '');
 				set_pref('oui_quote_author', $feed->contents->quotes[0]->{'author'});
-				set_pref('oui_quote_link', '');
+				set_pref('oui_quote_url', '');
 	        	break;
 	        case 'oui_quote_service_quotes_on_design':
-	        	unset($_POST['oui_quote_text'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_link']);
+	        	unset($_POST['oui_quote_body'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_url']);
 				$feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
-				set_pref('oui_quote_text', strip_tags($feed[0]->{'content'}));
+				set_pref('oui_quote_body', strip_tags($feed[0]->{'content'}));
 				set_pref('oui_quote_cite', '');
 				set_pref('oui_quote_author', $feed[0]->{'title'});
-				set_pref('oui_quote_link', $feed[0]->{'link'});
+				set_pref('oui_quote_url', $feed[0]->{'link'});
 	        	break;
 	        case 'oui_quote_service_le_monde':
-	        	unset($_POST['oui_quote_text'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_link']);
+	        	unset($_POST['oui_quote_body'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_url']);
 				$feed = simplexml_load_string(file_get_contents('http://dicocitations.lemonde.fr/xml-rss2.php'));
-				set_pref('oui_quote_link', $feed->channel->item->link);
+				set_pref('oui_quote_url', $feed->channel->item->link);
 				$feed = preg_split( "/(\[|\])/", strip_tags($feed->channel->item->description));
-				set_pref('oui_quote_text', trim($feed[0]));
+				set_pref('oui_quote_body', trim($feed[0]));
 				set_pref('oui_quote_cite', trim($feed[2]));
 				set_pref('oui_quote_author', trim($feed[1]));
 	        	break;
 	        case 'oui_quote_service_le_figaro':
-	        	unset($_POST['oui_quote_text'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_link']);
+	        	unset($_POST['oui_quote_body'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_url']);
 				$feed = simplexml_load_string(file_get_contents('http://evene.lefigaro.fr/rss/citation_jour.xml'));
-				set_pref('oui_quote_link', $feed->channel->item->link);
+				set_pref('oui_quote_url', $feed->channel->item->link);
 				$feed = preg_split( "/ - /", strip_tags($feed->channel->item->title));
-				set_pref('oui_quote_text', $feed[1]);
+				set_pref('oui_quote_body', $feed[1]);
 				set_pref('oui_quote_cite', '');
 				set_pref('oui_quote_author', $feed[0]);
 	        	break;	        	
@@ -397,23 +407,24 @@ function oui_quote_inject_data() {
 function oui_quote($atts, $thing=null) {
     global $quote, $author, $cite, $via, $url, $service;
 
-    $via = gTxt(get_pref('oui_quote_services'));
+	$services = get_pref('oui_quote_services');
+    $via = gTxt($services);
 
     extract(lAtts(array(
         'service' => ($via ? 1 : 0),
-        'wraptag'    => 'blockquote',
+        'wraptag'    => 'figure',
         'class'      => '',
         'label'      => '',
         'labeltag'   => '',
     ),$atts));
 
     $cache_time = get_pref('oui_quote_cache_time');
-    
+
     // No quote stored ot outdated cache.
-    $needquery = ((!get_pref('oui_quote_text') || (time() - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false);
+    $needquery = ((!get_pref('oui_quote_body') || (time() - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false);
 
     if ($needquery) {
-	    switch (get_pref('oui_quote_services')) {
+	    switch ($services) {
 	        case 'oui_quote_service_they_said_so':
 	        	$feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
 				$quote = $feed->contents->quotes[0]->{'quote'};
@@ -441,9 +452,10 @@ function oui_quote($atts, $thing=null) {
 				$url = $feed->channel->item->link;
 	        	break;	
 			default:
-				$quote = get_pref('oui_quote_text');
+				$quote = get_pref('oui_quote_body');
 				$cite = get_pref('oui_quote_cite');
 				$author = get_pref('oui_quote_author');
+                $url = get_pref('oui_quote_url');
 				break;	    
 		}
 		update_lastmod();
@@ -452,29 +464,29 @@ function oui_quote($atts, $thing=null) {
 	    if ($cache_time > 0) {
 	        // Time stamp and store the new data in the prefs.
 	        set_pref('oui_quote_cache_set', time());
-	        set_pref('oui_quote_text', $quote);
+	        set_pref('oui_quote_body', $quote);
 	        set_pref('oui_quote_author', $author);
-	        if ($cite) { set_pref('oui_quote_text', $cite); }
-	        if ($url) { set_pref('oui_quote_link', $url); }
+	        if ($cite) { set_pref('oui_quote_body', $cite); }
+	        if ($url) { set_pref('oui_quote_url', $url); }
 	    }
 
 	// Cache is set and is not outdated, data exists.  
     } else if (!$needquery && $cache_time > 0) {
-        $quote = get_pref('oui_quote_text');
+        $quote = get_pref('oui_quote_body');
         $cite = get_pref('oui_quote_cite');
         $author = get_pref('oui_quote_author');
-        $url = get_pref('oui_quote_link');
+        $url = get_pref('oui_quote_url');
     }
 
     if ($thing === null) {
 
 	    if ($service) {
-	    	$cite = '<cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
+	    	$cite = '<br /><cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
 	    } else {
-	    	$cite = ($cite ? '<cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
+	    	$cite = ($cite ? '<br /><cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
 	    }
 
-        $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.n.$cite.'</footer>';
+        $data = '<blockquote>'.$quote.'</blockquote>'.n.'<figcaption>'.$author.n.$cite.'</figcaption>';
 
     } else {
 
@@ -488,12 +500,12 @@ function oui_quote($atts, $thing=null) {
 /**
  * Display the body of the quote.
  */
-function oui_quote_text($atts) {
+function oui_quote_body($atts) {
     global $quote;
 
     extract(lAtts(array(
         'class'   => '',
-        'wraptag' => 'p',
+        'wraptag' => 'blockquote',
     ),$atts));
 
     return ($wraptag) ? doTag($quote, $wraptag, $class) : $out;
@@ -529,20 +541,6 @@ function oui_quote_author($atts) {
     extract(lAtts(array(
         'class'   => '',
         'wraptag' => 'span',
-    ),$atts));
-
-    return ($wraptag) ? doTag($author, $wraptag, $class) : $out;
-}
-
-/**
- * Display the url of the quote.
- */
-function oui_quote_url($atts) {
-    global $url;
-
-    extract(lAtts(array(
-        'class'   => '',
-        'wraptag' => '',
     ),$atts));
 
     return ($wraptag) ? doTag($author, $wraptag, $class) : $out;

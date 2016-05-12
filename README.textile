@@ -1,12 +1,12 @@
-h1. oui_quote <img src="https://img.shields.io/badge/textpattern-4.5+-brightgreen.svg" />
-
-*!In process:* this plugin is not officially released yet.
+h1. oui_quote <img src="https://img.shields.io/badge/textpattern-4.5+-brightgreen.svg" /> <img src="https://img.shields.io/github/release/NicolasGraph/oui_quote.svg?maxAge=300" />
 
 Easily display your own quote or pull one from the following services:
+* "Le Figaro":http://evene.lefigaro.fr/citations (fr).
+* "Le Monde":http://le_monde.lemonde.fr/ (fr);
 * "Quotes on Design":http://quotesondesign.com/ (en);
 * "They Said So":https://theysaidso.com/ (en);
-* "Le Monde":http://dicocitations.lemonde.fr/ (fr);
-* "Le Figaro":http://evene.lefigaro.fr/citations (fr).
+
+"Download":https://github.com/NicolasGraph/oui_quote/releases | "Donate":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=PREHX3MZMXEUN
 
 h2. Table of contents
 
@@ -15,9 +15,9 @@ h2. Table of contents
 * "Preferences":#prefs
 * "Tags":#tags
 ** "oui_quote":#oui_quote
-** "oui_quote_text":#oui_quote_text
-** "oui_quote_cite":#oui_quote_cite
+** "oui_quote_body":#oui_quote_body
 ** "oui_quote_author":#oui_quote_author
+** "oui_quote_cite":#oui_quote_cite
 * "Examples":#examples
 ** "Single tag":#single_tag
 ** "Container tag":#container_tag
@@ -39,15 +39,14 @@ h2(#prefs). Preferences / options
 
 * *Service* — _Default: none_ - The service you want to use to pull the quote;
 * *Quote* — _Default: unset_ - The quote in use (automatically filled if a service is selected);
-* *Source* — _Default: unset_ - The source of the quote in use (automatically filled by Le Monde only);
+* *Reference* — _Default: unset_ - The reference of the quote in use (automatically filled by Le Monde only);
 * *Author* — _Default: unset_ - The author of the quote (automatically filled if a service is selected);
+* *Url* — _Default: unset_ - The url of the quote source (automatically filled if a service is selected);
 * *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 
 h2(#tags). Tags
 
 h3(#oui_quote). oui_quote
-
-Displays the quote.
 
 bc. <txp:oui_quote />
 
@@ -57,6 +56,8 @@ bc. <txp:oui_quote>
 […]
 </txp:oui_quote>
 
+Displays the quote.
+
 h4. Attributes
 
 _(Alphabetical order)_
@@ -64,39 +65,27 @@ _(Alphabetical order)_
 * @class="…"@ – _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@.
 * @label="…"@ – _Default: unset_ - The label used to entitled the generated content.
 * @labeltag="…"@ - _Default: unset_ - The HTML tag used around the value assigned to @label@.
-* @wraptag="…"@ - _Default: blockquote_ - The HTML tag to use around the generated content.
+* @service="…"@ - _Default: 1 if a service is selected, or 0_ - display the name/link of/to the service from which the quote was pulled;
+* @wraptag="…"@ - _Default: figure_ (see "here":http://alistapart.com/blog/post/more-thoughts-about-blockquotes-than-are-strictly-required) - The HTML tag to use around the generated content.
 
-h3(#oui_quote_text). oui_quote_text
+h3(#oui_quote_body). oui_quote_body
+
+bc. <txp:oui_quote_body />
 
 Displays the body of the quote.
-
-bc. <txp:oui_quote_text />
 
 h4. Attributes 
 
 _(Alphabetical order)_
 
 * @class="…"@ — _Default: unset_ - The css class to apply to the @img@ HTML tag or to the HTML tag assigned to @wraptag@.
-* @wraptag="…"@ — _Default: p_ - The HTML tag to use around the generated content.
-
-h3(#oui_quote_cite). oui_quote_cite
-
-Displays the source of the quote if available.
-
-bc. <txp:oui_quote_cite />
-
-h4. Attributes
-
-_(Alphabetical order)_
-
-* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
-* @wraptag="…"@ — _Default: cite_ - The HTML tag to use around the generated content.
+* @wraptag="…"@ — _Default: blockquote_ - The HTML tag to use around the generated content.
 
 h3(#oui_quote_author). oui_quote_author
 
-Displays the author.
-
 bc. <txp:oui_quote_author />
+
+Displays the author.
 
 h4. Attributes
 
@@ -105,33 +94,54 @@ _(Alphabetical order)_
 * @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
 * @wraptag="…"@ — _Default: span_ - The HTML tag to use around the generated content.
 
+h3(#oui_quote_cite). oui_quote_cite
+
+bc. <txp:oui_quote_cite />
+
+Displays the refernce of the quote and the service from which it was pulled.
+If an the url preference is filled, it will wrap the service or the source into a link.
+
+h4. Attributes
+
+_(Alphabetical order)_
+
+* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
+* @service="…"@ - _Default: inherited from the container tag - display the name/link of the service from which the quote was pulled;
+* @wraptag="…"@ — _Default: cite_ - The HTML tag to use around the generated content.
+
 h2(#examples). Examples
 
 h3(#single_tag). Example 1: single tag use
 
-bc. <txp:oui_quote />
+bc. <txp:oui_quote label="Citation du jour" labeltag="h1" />
 
-will return:
+when used with Le Monde will return:
 
-bc.. <blockquote>
-    <p>The quote.</p>
-    <footer>
-        <span>The author</span>, <cite>The reference</cite>
-    </footer>    
-</blockquote>
+bc.. <h1>Citation du jour</h1>
+<figure>
+    <p>Ce n'est pas parce-que vous êtes nombreux à avoir tort que vous avez raison.</p>
+    <figcaption>
+        <span>Bernard Werber</span>
+        <cite>Le Mystère des dieux (2007) via <a href="http://dicocitations.lemonde.fr/item-5133.html">Le Monde</a></cite>
+    </figcation>    
+</figure>
 
 h3(#container_tag). Example 2: container tag use
 
-bc. <txp:oui_quote>
-    <txp:oui_quote_text />
-    <txp:oui_quote_cite />
-    <txp:oui_quote_author />
+The previous example with the use of a container tag would look like:
+
+bc. <txp:oui_quote label="Citation du jour" labeltag="h1">
+    <txp:oui_quote_body />
+    <figcaption>
+        <txp:oui_quote_author />
+        <txp:oui_quote_cite />
+    </figcaption>
 </txp:oui_quote>
 
 h2(#author). Author
 
 "Nicolas Morand":https://github.com/NicolasGraph
-_Thank you to the "Textpattern core team":http://textpattern.com/patrons and "the CMS community":http://forum.textpattern.com/._ 
+_Thank you to the Textpattern community and the core team._ 
 
 h2(#licence). Licence
 
