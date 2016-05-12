@@ -34,6 +34,7 @@ oui_quote_author => Author
 oui_quote_link => Link
 oui_quote_cache_time => Cache time in minutes
 oui_quote_quotes_on_design => Random quote from Quotes on Design (en)
+oui_quote_service_quotes_on_design => Quotes on Design
 oui_quote_they_said_so => Quote of the day from They Said So (en)
 oui_quote_service_they_said_so => They Said So
 oui_quote_le_monde => Quote of the day from Le Monde (fr)
@@ -49,6 +50,7 @@ oui_quote_author => Author
 oui_quote_link => Lien
 oui_quote_cache_time => Durée du cache en minutes
 oui_quote_quotes_on_design => Citation aléatoire de Quotes on Design (en)
+oui_quote_service_quotes_on_design => Quotes on Design
 oui_quote_they_said_so => Citation du jour de They Said So (en)
 oui_quote_service_they_said_so => They Said So
 oui_quote_le_monde => Citation du jour du Monde (fr)
@@ -313,7 +315,12 @@ function oui_quote_install() {
  * Set Services pref function using selectInput()
  */
 function oui_quote_sercices_select($name, $val) {
-    $vals = array('oui_quote_service_quotes_on_design' => gTxt('oui_quote_quotes_on_design'), 'oui_quote_service_they_said_so' => gTxt('oui_quote_they_said_so'), 'oui_quote_service_le_monde' => gTxt('oui_quote_le_monde'), 'oui_quote_service_le_figaro' => gTxt('oui_quote_le_figaro'));
+    $vals = array(
+        'oui_quote_service_quotes_on_design' => gTxt('oui_quote_quotes_on_design'), 
+        'oui_quote_service_they_said_so' => gTxt('oui_quote_they_said_so'), 
+        'oui_quote_service_le_monde' => gTxt('oui_quote_le_monde'), 
+        'oui_quote_service_le_figaro' => gTxt('oui_quote_le_figaro')
+    );
     return selectInput($name, $vals, $val, '1', '1');
 }
 
@@ -322,11 +329,11 @@ function oui_quote_sercices_select($name, $val) {
  */
 function oui_quote_options() {
     if (defined('PREF_PLUGIN')) {
-        $link = '?event=prefs';
+        $url = '?event=prefs';
     } else {
-        $link = '?event=prefs&step=advanced_prefs';
+        $url = '?event=prefs&step=advanced_prefs';
     }
-    header('Location: ' . $link);
+    header('Location: ' . $url);
 }
 
 /**
@@ -388,9 +395,12 @@ function oui_quote_inject_data() {
  * display the content.
  */
 function oui_quote($atts, $thing=null) {
-    global $quote, $cite, $author;
+    global $quote, $author, $cite, $via, $url, $service;
+
+    $via = gTxt(get_pref('oui_quote_services'));
 
     extract(lAtts(array(
+        'service' => ($via ? 1 : 0),
         'wraptag'    => 'blockquote',
         'class'      => '',
         'label'      => '',
@@ -398,7 +408,6 @@ function oui_quote($atts, $thing=null) {
     ),$atts));
 
     $cache_time = get_pref('oui_quote_cache_time');
-    $service = gTxt(get_pref('oui_quote_services'));
     
     // No quote stored ot outdated cache.
     $needquery = ((!get_pref('oui_quote_text') || (time() - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false);
@@ -414,7 +423,7 @@ function oui_quote($atts, $thing=null) {
 				$feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
 				$quote = strip_tags($feed[0]->{'content'});
 				$author = $feed[0]->{'title'};
-				$link = $feed[0]->{'link'};
+				$url = $feed[0]->{'link'};
 	        	break;
 	        case 'oui_quote_service_le_monde':
 				$feed = simplexml_load_string(file_get_contents('http://dicocitations.lemonde.fr/xml-rss2.php'));
@@ -422,14 +431,14 @@ function oui_quote($atts, $thing=null) {
 				$quote = $feed[0];
 				$cite = $feed[2];
 				$author = $feed[1];
-				$link = $feed->channel->item->link;
+				$url = $feed->channel->item->link;
 	        	break;
 	        case 'oui_quote_service_le_figaro':
 				$feed = simplexml_load_string(file_get_contents('http://evene.lefigaro.fr/rss/citation_jour.xml'));
 				$feed = preg_split( "/ - /", strip_tags($feed->channel->item->title));
 				$quote = $feed[1];
 				$author = $feed[0];
-				$link = $feed->channel->item->link;
+				$url = $feed->channel->item->link;
 	        	break;	
 			default:
 				$quote = get_pref('oui_quote_text');
@@ -446,7 +455,7 @@ function oui_quote($atts, $thing=null) {
 	        set_pref('oui_quote_text', $quote);
 	        set_pref('oui_quote_author', $author);
 	        if ($cite) { set_pref('oui_quote_text', $cite); }
-	        if ($link) { set_pref('oui_quote_link', $link); }
+	        if ($url) { set_pref('oui_quote_link', $url); }
 	    }
 
 	// Cache is set and is not outdated, data exists.  
@@ -454,22 +463,26 @@ function oui_quote($atts, $thing=null) {
         $quote = get_pref('oui_quote_text');
         $cite = get_pref('oui_quote_cite');
         $author = get_pref('oui_quote_author');
-        $link = get_pref('oui_quote_link');
+        $url = get_pref('oui_quote_link');
     }
 
-    // single tag use.
     if ($thing === null) {
-        $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.($cite ? n.'<cite>'.$cite.' via '.href($service, $link).'</cite>' : '').'</footer>';
-        $out = (($label) ? doLabel($label, $labeltag) : '').\n
-               .doTag($data, $wraptag, $class);
-    // Conatiner tag use.
+
+	    if ($service) {
+	    	$cite = '<cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
+	    } else {
+	    	$cite = ($cite ? '<cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
+	    }
+
+        $data = '<p>'.$quote.'</p>'.n.'<footer>'.$author.n.$cite.'</footer>';
+
     } else {
-        $data = parse($thing);
-        $out = (($label) ? doLabel($label, $labeltag) : '').\n
-               .doTag($data, $wraptag, $class);
+
+    	$data = parse($thing);
+
     }
-    
-    return $out;
+
+    return (($label) ? doLabel($label, $labeltag) : '').n.doTag($data, $wraptag, $class);
 }
 
 /**
@@ -490,12 +503,19 @@ function oui_quote_text($atts) {
  * Display the reference of the quote.
  */
 function oui_quote_cite($atts) {
-    global $cite;
+    global $cite, $via, $url, $service;
 
     extract(lAtts(array(
+        'service' => $service,
         'class'   => '',
         'wraptag' => 'cite',
     ),$atts));
+
+    if ($service == 1) {
+    	$cite = '<cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
+    } else {
+    	$cite = ($cite ? '<cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
+    }
 
     return ($wraptag) ? doTag($cite, $wraptag, $class) : $out;
 }
@@ -518,7 +538,7 @@ function oui_quote_author($atts) {
  * Display the url of the quote.
  */
 function oui_quote_url($atts) {
-    global $link;
+    global $url;
 
     extract(lAtts(array(
         'class'   => '',
