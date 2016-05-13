@@ -4,7 +4,7 @@ $plugin['name'] = 'oui_quote';
 
 $plugin['allow_html_help'] = 0;
 
-$plugin['version'] = '0.1.1';
+$plugin['version'] = '0.1.2-beta';
 $plugin['author'] = 'Nicolas Morand';
 $plugin['author_uri'] = 'https://github.com/NicolasGraph';
 $plugin['description'] = 'Display a custom quote or pull one from a web service';
@@ -131,7 +131,7 @@ _(Alphabetical order)_
 * @class="…"@ – _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@.
 * @label="…"@ – _Default: unset_ - The label used to entitled the generated content.
 * @labeltag="…"@ - _Default: unset_ - The HTML tag used around the value assigned to @label@.
-* @service="…"@ - _Default: 1 if a service is selected, or 0_ - display the name/link of/to the service from which the quote was pulled;
+* @service="…"@ - _Default: 1 if a service is selected, or 0_ - display the name/link of/to the service from which the quote was pulled (usually required, read terms and conditions of use of the service in use);
 * @wraptag="…"@ - _Default: figure_ (see "here":http://alistapart.com/blog/post/more-thoughts-about-blockquotes-than-are-strictly-required) - The HTML tag to use around the generated content.
 
 h3(#oui_quote_body). oui_quote_body
@@ -172,7 +172,7 @@ h4. Attributes
 _(Alphabetical order)_
 
 * @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
-* @service="…"@ - _Default: inherited from the container tag - display the name/link of the service from which the quote was pulled;
+* @service="…"@ - _Default: 1 (inherited from the container tag) - display the name/link of the service from which the quote was pulled (usually required, read terms and conditions of use of the service in use);
 * @wraptag="…"@ — _Default: cite_ - The HTML tag to use around the generated content.
 
 h2(#examples). Examples
@@ -363,7 +363,7 @@ function oui_quote_inject_data() {
                 set_pref('oui_quote_body', $feed->contents->quotes[0]->{'quote'});
                 set_pref('oui_quote_cite', '');
                 set_pref('oui_quote_author', $feed->contents->quotes[0]->{'author'});
-                set_pref('oui_quote_url', '');
+                set_pref('oui_quote_url', 'https://theysaidso.com');
                 break;
             case 'oui_quote_service_quotes_on_design':
                 unset($_POST['oui_quote_body'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_url']);
@@ -429,6 +429,7 @@ function oui_quote($atts, $thing=null) {
                 $feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
                 $quote = $feed->contents->quotes[0]->{'quote'};
                 $author = $feed->contents->quotes[0]->{'author'};
+                $url = 'https://theysaidso.com';
                 break;
             case 'oui_quote_service_quotes_on_design':
                 $feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
@@ -438,18 +439,18 @@ function oui_quote($atts, $thing=null) {
                 break;
             case 'oui_quote_service_le_monde':
                 $feed = simplexml_load_string(file_get_contents('http://dicocitations.lemonde.fr/xml-rss2.php'));
+                $url = $feed->channel->item->link;
                 $feed = preg_split( "/(\[|\])/", strip_tags($feed->channel->item->description));
                 $quote = $feed[0];
                 $cite = $feed[2];
                 $author = $feed[1];
-                $url = $feed->channel->item->link;
                 break;
             case 'oui_quote_service_le_figaro':
                 $feed = simplexml_load_string(file_get_contents('http://evene.lefigaro.fr/rss/citation_jour.xml'));
+                $url = $feed->channel->item->link;
                 $feed = preg_split( "/ - /", strip_tags($feed->channel->item->title));
                 $quote = $feed[1];
                 $author = $feed[0];
-                $url = $feed->channel->item->link;
                 break;    
             default:
                 $quote = get_pref('oui_quote_body');
@@ -524,9 +525,9 @@ function oui_quote_cite($atts) {
     ),$atts));
 
     if ($service == 1) {
-        $reference = '<cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
+        $reference = ($cite ? $cite : '').' via '.($url ? href($via, $url) : $via);
     } else {
-        $reference = ($cite ? '<cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
+        $reference = ($cite ? ($url ? href($cite, $url) : $cite) : '');
     }
 
     return ($wraptag) ? doTag($reference, $wraptag, $class) : $out;
