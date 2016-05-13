@@ -65,7 +65,7 @@ _(Alphabetical order)_
 * @class="…"@ – _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@.
 * @label="…"@ – _Default: unset_ - The label used to entitled the generated content.
 * @labeltag="…"@ - _Default: unset_ - The HTML tag used around the value assigned to @label@.
-* @service="…"@ - _Default: 1 if a service is selected, or 0_ - display the name/link of/to the service from which the quote was pulled;
+* @service="…"@ - _Default: 1 if a service is selected, or 0_ - display the name/link of/to the service from which the quote was pulled (usually required, read terms and conditions of use of the service in use);
 * @wraptag="…"@ - _Default: figure_ (see "here":http://alistapart.com/blog/post/more-thoughts-about-blockquotes-than-are-strictly-required) - The HTML tag to use around the generated content.
 
 h3(#oui_quote_body). oui_quote_body
@@ -91,7 +91,7 @@ h4. Attributes
 
 _(Alphabetical order)_
 
-* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
+* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@.
 * @wraptag="…"@ — _Default: span_ - The HTML tag to use around the generated content.
 
 h3(#oui_quote_cite). oui_quote_cite
@@ -106,7 +106,7 @@ h4. Attributes
 _(Alphabetical order)_
 
 * @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
-* @service="…"@ - _Default: inherited from the container tag - display the name/link of the service from which the quote was pulled;
+* @service="…"@ - _Default: 1 (inherited from the container tag) - display the name/link of the service from which the quote was pulled (usually required, read terms and conditions of use of the service in use);
 * @wraptag="…"@ — _Default: cite_ - The HTML tag to use around the generated content.
 
 h2(#examples). Examples
@@ -141,7 +141,7 @@ bc. <txp:oui_quote label="Citation du jour" labeltag="h1">
 h2(#author). Author
 
 "Nicolas Morand":https://github.com/NicolasGraph
-_Thank you to the Textpattern community and the core team._ 
+_Thank you to the Textpattern community and the core team._
 
 h2(#licence). Licence
 
