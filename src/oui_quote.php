@@ -4,7 +4,7 @@ $plugin['name'] = 'oui_quote';
 
 $plugin['allow_html_help'] = 0;
 
-$plugin['version'] = '0.1.0';
+$plugin['version'] = '0.1.1';
 $plugin['author'] = 'Nicolas Morand';
 $plugin['author_uri'] = 'https://github.com/NicolasGraph';
 $plugin['description'] = 'Display a custom quote or pull one from a web service';
@@ -481,12 +481,12 @@ function oui_quote($atts, $thing=null) {
     if ($thing === null) {
 
         if ($service) {
-            $cite = '<br /><cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
+            $reference = '<br /><cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
         } else {
-            $cite = ($cite ? '<br /><cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
+            $reference = ($cite ? '<br /><cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
         }
 
-        $data = '<blockquote>'.$quote.'</blockquote>'.n.'<figcaption>'.$author.n.$cite.'</figcaption>';
+        $data = '<blockquote>'.$quote.'</blockquote>'.n.'<figcaption>'.$author.n.$reference.'</figcaption>';
 
     } else {
 
@@ -524,12 +524,12 @@ function oui_quote_cite($atts) {
     ),$atts));
 
     if ($service == 1) {
-        $cite = '<cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
+        $reference = '<cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
     } else {
-        $cite = ($cite ? '<cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
+        $reference = ($cite ? '<cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
     }
 
-    return ($wraptag) ? doTag($cite, $wraptag, $class) : $out;
+    return ($wraptag) ? doTag($reference, $wraptag, $class) : $out;
 }
 
 /**
