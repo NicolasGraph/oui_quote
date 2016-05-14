@@ -4,7 +4,7 @@ $plugin['name'] = 'oui_quote';
 
 $plugin['allow_html_help'] = 0;
 
-$plugin['version'] = '0.1.2';
+$plugin['version'] = '0.1.3';
 $plugin['author'] = 'Nicolas Morand';
 $plugin['author_uri'] = 'https://github.com/NicolasGraph';
 $plugin['description'] = 'Display a custom quote or pull one from a web service';
@@ -234,12 +234,26 @@ if (class_exists('\Textpattern\Tag\Registry')) {
  * Register callbacks.
  */
 if (txpinterface === 'admin') {
+
     add_privs('prefs.oui_quote', '1');
     add_privs('plugin_prefs.oui_quote', '1');
+
     register_callback('oui_quote_welcome', 'plugin_lifecycle.oui_quote');
     register_callback('oui_quote_install', 'prefs', null, 1);
     register_callback('oui_quote_options', 'plugin_prefs.oui_quote', null, 1);
     register_callback('oui_quote_inject_data', 'prefs', 'prefs_save', 1);
+
+    $prefList = oui_quote_preflist();
+    foreach ($prefList as $pref => $options) {
+        register_callback('oui_quote_pophelp', 'admin_help', $pref);
+    }
+}
+
+/**
+ * Get external popHelp contents
+ */
+function oui_quote_pophelp($evt, $stp, $ui, $vars) {
+    return str_replace(HELP_URL, 'http://help.nicolasmorand.com/', $ui);
 }
 
 /**
@@ -273,53 +287,86 @@ function oui_quote_welcome($evt, $stp)
  * PREF_PLUGIN for 4.5
  * PREF_ADVANCED for 4.6+
  */
+function oui_quote_preflist() {
+    $prefList = array(
+        'oui_quote_services' => array(
+            'value'      => '',
+            'event'      => 'oui_quote',
+            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'widget'     => 'oui_quote_sercices_select',
+            'position'   => '10',
+            'is_private' => false,
+        ), 
+        'oui_quote_body' => array(
+            'value'      => '',
+            'event'      => 'oui_quote',
+            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'widget'     => 'text_input',
+            'position'   => '10',
+            'is_private' => false,
+        ), 
+        'oui_quote_author' => array(
+            'value'      => '',
+            'event'      => 'oui_quote',
+            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'widget'     => 'text_input',
+            'position'   => '10',
+            'is_private' => false,
+        ),
+        'oui_quote_author' => array(
+            'value'      => '',
+            'event'      => 'oui_quote',
+            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'widget'     => 'text_input',
+            'position'   => '10',
+            'is_private' => false,
+        ), 
+        'oui_quote_url' => array(
+            'value'      => '',
+            'event'      => 'oui_quote',
+            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'widget'     => 'text_input',
+            'position'   => '10',
+            'is_private' => false,
+        ),
+        'oui_quote_cache_time' => array(
+            'value'      => '',
+            'event'      => 'oui_quote',
+            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'widget'     => 'text_input',
+            'position'   => '10',
+            'is_private' => false,
+        ),
+        'oui_quote_cache_set' => array(
+            'value'      => '',
+            'event'      => 'oui_quote',
+            'visibility' => PREF_HIDDEN,
+            'widget'     => 'text_input',
+            'position'   => '10',
+            'is_private' => false,
+        ),
+    );
+    return $prefList;    
+}          
+
 function oui_quote_install() {
-    if (get_pref('oui_quote_services', null) === null) {
-        if (defined('PREF_PLUGIN')) {
-            set_pref('oui_quote_services', '', 'oui_quote', PREF_PLUGIN, 'oui_quote_sercices_select', 10);
-        } else {
-            set_pref('oui_quote_services', '', 'oui_quote', PREF_ADVANCED, 'oui_quote_sercices_select', 10);
+	
+    $prefList = oui_quote_preflist();
+
+    foreach ($prefList as $pref => $options) {
+        if (get_pref($pref, null) === null) {
+            set_pref(
+                $pref,
+                $options['value'],
+                $options['event'],
+                $options['visibility'],
+                $options['widget'],
+                $options['position'],
+                $options['is_private']
+            );
         }
     }
-    if (get_pref('oui_quote_body', null) === null) {
-        if (defined('PREF_PLUGIN')) {
-            set_pref('oui_quote_body', '', 'oui_quote', PREF_PLUGIN, 'text_input', 20);
-        } else {
-            set_pref('oui_quote_body', '', 'oui_quote', PREF_ADVANCED, 'text_input', 20);
-        }
-    }
-    if (get_pref('oui_quote_author', null) === null) {
-        if (defined('PREF_PLUGIN')) {
-            set_pref('oui_quote_cite', '', 'oui_quote', PREF_PLUGIN, 'text_input', 30);
-        } else {
-            set_pref('oui_quote_cite', '', 'oui_quote', PREF_ADVANCED, 'text_input', 30);
-        }
-    }
-    if (get_pref('oui_quote_author', null) === null) {
-        if (defined('PREF_PLUGIN')) {
-            set_pref('oui_quote_author', '', 'oui_quote', PREF_PLUGIN, 'text_input', 40);
-        } else {
-            set_pref('oui_quote_author', '', 'oui_quote', PREF_ADVANCED, 'text_input', 40);
-        }
-    }
-    if (get_pref('oui_quote_url', null) === null) {
-        if (defined('PREF_PLUGIN')) {
-            set_pref('oui_quote_url', '', 'oui_quote', PREF_PLUGIN, 'text_input', 50);
-        } else {
-            set_pref('oui_quote_url', '', 'oui_quote', PREF_ADVANCED, 'text_input', 50);
-        }
-    }
-    if (get_pref('oui_quote_cache_time', null) === null) {
-        if (defined('PREF_PLUGIN')) {
-            set_pref('oui_quote_cache_time', '60', 'oui_quote', PREF_PLUGIN, 'text_input', 60);
-        } else {
-            set_pref('oui_quote_cache_time', '60', 'oui_quote', PREF_ADVANCED, 'text_input', 60);
-        }
-    }
-    if (get_pref('oui_instagram_cache_set', null) === null) {
-        set_pref('oui_instagram_cache_set', time(), 'oui_instagram', PREF_HIDDEN, 'text_input', 70);
-    }
-}
+} 
 
 /**
  * Set Services pref function using selectInput()
