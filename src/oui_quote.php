@@ -435,6 +435,7 @@ function oui_quote_inject_data() {
         unset($_POST['oui_quote_cache_set']);
         set_pref('oui_quote_cache_set', time());
     }
+    update_lastmod();
 }
 
 /**
@@ -458,15 +459,13 @@ function oui_quote($atts, $thing=null) {
         'labeltag'   => '',
     ),$atts));
 
-    $quote = get_pref('oui_quote_body');
     $cache_time = get_pref('oui_quote_cache_time');
     $now = time();
 
     // No quote stored ot outdated cache.
-    $needquery = (!isset($quote) || ($now - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false;
+    $needquery = (!empty($via) && ($now - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false;
 
     if ($needquery) {
-
         switch ($services) {
             case 'oui_quote_service_they_said_so':
                 $feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
@@ -510,7 +509,8 @@ function oui_quote($atts, $thing=null) {
         }
 
     // Cache is set and is not outdated.
-    } else if (!$needquery && $cache_time > 0) {
+    } else {
+        $quote = get_pref('oui_quote_body');
         $cite = get_pref('oui_quote_cite');
         $author = get_pref('oui_quote_author');
         $url = get_pref('oui_quote_url');
