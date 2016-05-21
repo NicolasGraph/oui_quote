@@ -140,7 +140,7 @@ bc. <txp:oui_quote_body />
 
 Displays the body of the quote.
 
-h4. Attributes 
+h4. Attributes
 
 _(Alphabetical order)_
 
@@ -171,7 +171,7 @@ h4. Attributes
 
 _(Alphabetical order)_
 
-* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
+* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@.
 * @service="…"@ - _Default: 1 (inherited from the container tag) - display the name/link of the service from which the quote was pulled (usually required, read terms and conditions of use of the service in use);
 * @wraptag="…"@ — _Default: cite_ - The HTML tag to use around the generated content.
 
@@ -189,7 +189,7 @@ bc.. <h1>Citation du jour</h1>
     <figcaption>
         <span>Bernard Werber</span>
         <cite>Le Mystère des dieux (2007) via <a href="http://dicocitations.lemonde.fr/item-5133.html">Le Monde</a></cite>
-    </figcation>    
+    </figcation>
 </figure>
 
 h3(#container_tag). Example 2: container tag use
@@ -253,7 +253,7 @@ if (txpinterface === 'admin') {
  * Get external popHelp contents
  */
 function oui_quote_pophelp($evt, $stp, $ui, $vars) {
-    return str_replace(HELP_URL, 'http://help.nicolasmorand.com/', $ui);
+    return str_replace(HELP_URL, 'http://help.ouisource.com/', $ui);
 }
 
 /**
@@ -270,12 +270,9 @@ function oui_quote_welcome($evt, $stp)
             oui_quote_install();
             break;
         case 'deleted':
-            if (function_exists('remove_pref')) {
-                // Txp 4.6
-                remove_pref(null, 'oui_quote');
-            } else {
-                safe_delete('txp_prefs', "event='oui_quote'");
-            }
+            function_exists('remove_pref')
+                ? remove_pref(null, 'oui_quote')
+                : safe_delete('txp_prefs', "event='oui_quote'");
             safe_delete('txp_lang', "name LIKE 'oui\_quote%'");
             break;
     }
@@ -292,49 +289,49 @@ function oui_quote_preflist() {
         'oui_quote_services' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
             'widget'     => 'oui_quote_sercices_select',
             'position'   => '10',
             'is_private' => false,
-        ), 
+        ),
         'oui_quote_body' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
             'widget'     => 'text_input',
-            'position'   => '10',
-            'is_private' => false,
-        ), 
-        'oui_quote_author' => array(
-            'value'      => '',
-            'event'      => 'oui_quote',
-            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
-            'widget'     => 'text_input',
-            'position'   => '10',
+            'position'   => '20',
             'is_private' => false,
         ),
         'oui_quote_author' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
             'widget'     => 'text_input',
-            'position'   => '10',
+            'position'   => '30',
             'is_private' => false,
-        ), 
+        ),
+        'oui_quote_cite' => array(
+            'value'      => '',
+            'event'      => 'oui_quote',
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
+            'widget'     => 'text_input',
+            'position'   => '40',
+            'is_private' => false,
+        ),
         'oui_quote_url' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
             'widget'     => 'text_input',
-            'position'   => '10',
+            'position'   => '50',
             'is_private' => false,
         ),
         'oui_quote_cache_time' => array(
-            'value'      => '',
+            'value'      => '60',
             'event'      => 'oui_quote',
-            'visibility' => (defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED),
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
             'widget'     => 'text_input',
-            'position'   => '10',
+            'position'   => '60',
             'is_private' => false,
         ),
         'oui_quote_cache_set' => array(
@@ -342,15 +339,15 @@ function oui_quote_preflist() {
             'event'      => 'oui_quote',
             'visibility' => PREF_HIDDEN,
             'widget'     => 'text_input',
-            'position'   => '10',
+            'position'   => '70',
             'is_private' => false,
         ),
     );
-    return $prefList;    
-}          
+    return $prefList;
+}
 
 function oui_quote_install() {
-	
+
     $prefList = oui_quote_preflist();
 
     foreach ($prefList as $pref => $options) {
@@ -366,7 +363,7 @@ function oui_quote_install() {
             );
         }
     }
-} 
+}
 
 /**
  * Set Services pref function using selectInput()
@@ -385,23 +382,19 @@ function oui_quote_sercices_select($name, $val) {
  * Jump to the prefs panel.
  */
 function oui_quote_options() {
-    if (defined('PREF_PLUGIN')) {
-        $url = '?event=prefs';
-    } else {
-        $url = '?event=prefs&step=advanced_prefs';
-    }
+    $url = defined('PREF_PLUGIN') ? '?event=prefs' : '?event=prefs&step=advanced_prefs';
     header('Location: ' . $url);
 }
 
 /**
  * Force pulled data injection in the prefs fields on service selection.
- * 
+ *
  * if service has changed;
  * or the quote field is empty;
  * or the cache is outdated.
  */
 function oui_quote_inject_data() {
-    
+
     if (($_POST['oui_quote_services'] !== get_pref('oui_quote_services')) || (!get_pref('oui_quote_body') || (time() - get_pref('oui_quote_cache_set')) > ($_POST['oui_quote_cache_time'] * 60))) {
         switch ($_POST['oui_quote_services']) {
             case 'oui_quote_service_they_said_so':
@@ -437,7 +430,7 @@ function oui_quote_inject_data() {
                 set_pref('oui_quote_body', $feed[1]);
                 set_pref('oui_quote_cite', '');
                 set_pref('oui_quote_author', $feed[0]);
-                break;                
+                break;
         }
         unset($_POST['oui_quote_cache_set']);
         set_pref('oui_quote_cache_set', time());
@@ -446,7 +439,7 @@ function oui_quote_inject_data() {
 
 /**
  * Main plugin function.
- * 
+ *
  * Pull the quote if needed;
  * store data in the prefs fields;
  * display the content.
@@ -465,12 +458,15 @@ function oui_quote($atts, $thing=null) {
         'labeltag'   => '',
     ),$atts));
 
+    $quote = get_pref('oui_quote_body');
     $cache_time = get_pref('oui_quote_cache_time');
+    $now = time();
 
     // No quote stored ot outdated cache.
-    $needquery = ((!get_pref('oui_quote_body') || (time() - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false);
+    $needquery = (!isset($quote) || ($now - get_pref('oui_quote_cache_set')) > ($cache_time * 60)) ? true : false;
 
     if ($needquery) {
+
         switch ($services) {
             case 'oui_quote_service_they_said_so':
                 $feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
@@ -498,29 +494,23 @@ function oui_quote($atts, $thing=null) {
                 $feed = preg_split( "/ - /", strip_tags($feed->channel->item->title));
                 $quote = $feed[1];
                 $author = $feed[0];
-                break;    
-            default:
-                $quote = get_pref('oui_quote_body');
-                $cite = get_pref('oui_quote_cite');
-                $author = get_pref('oui_quote_author');
-                $url = get_pref('oui_quote_url');
-                break;        
+                break;
+
+            update_lastmod();
         }
-        update_lastmod();
 
         // Cache needed.
         if ($cache_time > 0) {
             // Time stamp and store the new data in the prefs.
-            set_pref('oui_quote_cache_set', time());
-            set_pref('oui_quote_body', $quote);
-            set_pref('oui_quote_author', $author);
-            if ($cite) { set_pref('oui_quote_body', $cite); }
-            if ($url) { set_pref('oui_quote_url', $url); }
+            set_pref('oui_quote_cache_set', $now);
+            !$quote ?: set_pref('oui_quote_body', $quote);
+            !$author ?: set_pref('oui_quote_author', $author);
+            !$cite ?: set_pref('oui_quote_cite', $cite);
+            !$url ?: set_pref('oui_quote_url', $url);
         }
 
-    // Cache is set and is not outdated, data exists.  
+    // Cache is set and is not outdated.
     } else if (!$needquery && $cache_time > 0) {
-        $quote = get_pref('oui_quote_body');
         $cite = get_pref('oui_quote_cite');
         $author = get_pref('oui_quote_author');
         $url = get_pref('oui_quote_url');
@@ -528,11 +518,9 @@ function oui_quote($atts, $thing=null) {
 
     if ($thing === null) {
 
-        if ($service) {
-            $reference = '<br /><cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>';
-        } else {
-            $reference = ($cite ? '<br /><cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
-        }
+        $service
+            ? $reference = '<br /><cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>'
+            : $reference = ($cite ? '<br /><cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
 
         $data = '<blockquote>'.$quote.'</blockquote>'.n.'<figcaption>'.$author.n.$reference.'</figcaption>';
 
@@ -571,11 +559,9 @@ function oui_quote_cite($atts) {
         'wraptag' => 'cite',
     ),$atts));
 
-    if ($service == 1) {
-        $reference = ($cite ? $cite : '').' via '.($url ? href($via, $url) : $via);
-    } else {
-        $reference = ($cite ? ($url ? href($cite, $url) : $cite) : '');
-    }
+    $service == 1
+        ? $reference = ($cite ? $cite : '').' via '.($url ? href($via, $url) : $via)
+        : $reference = ($cite ? ($url ? href($cite, $url) : $cite) : '');
 
     return ($wraptag) ? doTag($reference, $wraptag, $class) : $out;
 }
