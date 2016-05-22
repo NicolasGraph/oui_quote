@@ -544,7 +544,7 @@ function oui_quote_body($atts) {
         'wraptag' => 'blockquote',
     ),$atts));
 
-    return ($wraptag) ? doTag($quote, $wraptag, $class) : $out;
+    return ($wraptag) ? doTag($quote, $wraptag, $class) : $quote;
 }
 
 /**
@@ -563,7 +563,7 @@ function oui_quote_cite($atts) {
         ? $reference = ($cite ? $cite : '').' via '.($url ? href($via, $url) : $via)
         : $reference = ($cite ? ($url ? href($cite, $url) : $cite) : '');
 
-    return ($wraptag) ? doTag($reference, $wraptag, $class) : $out;
+    return ($wraptag) ? doTag($reference, $wraptag, $class) : $reference;
 }
 
 /**
@@ -577,7 +577,7 @@ function oui_quote_author($atts) {
         'wraptag' => 'span',
     ),$atts));
 
-    return ($wraptag) ? doTag($author, $wraptag, $class) : $out;
+    return ($wraptag) ? doTag($author, $wraptag, $class) : $author;
 }
 # --- END PLUGIN CODE ---
 
