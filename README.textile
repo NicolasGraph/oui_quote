@@ -1,4 +1,4 @@
-h1. oui_quote <img src="https://img.shields.io/badge/textpattern-4.5+-brightgreen.svg" /> <img src="https://img.shields.io/github/release/NicolasGraph/oui_quote.svg" />
+h1. oui_quote <img src="https://img.shields.io/badge/textpattern-4.6+-brightgreen.svg" /> <img src="https://img.shields.io/github/release/NicolasGraph/oui_quote.svg" />
 
 Easily display your own quote or pull one from the following services:
 * "Le Figaro":http://evene.lefigaro.fr/citations (fr).
@@ -28,7 +28,7 @@ h2(#requirements). Plugin requirements
 
 oui_quote’s minimum requirements:
 
-* Textpattern 4.5+
+* Textpattern 4.6+
 
 h2(#installation). Installation
 
@@ -37,17 +37,12 @@ h2(#installation). Installation
 
 h2(#prefs). Preferences / options
 
-h3. Txp4.5+
-
 * *Service* — _Default: none_ - The service you want to use to pull the quote;
-* *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
-
-h3. Txp4.6+ only
-
 * *Quote* — _Default: unset_ - The quote in use (automatically filled if a service is selected);
 * *Reference* — _Default: unset_ - The reference of the quote in use (automatically filled by Le Monde only);
 * *Author* — _Default: unset_ - The author of the quote (automatically filled if a service is selected);
 * *Url* — _Default: unset_ - The url of the quote source (automatically filled if a service is selected);
+* *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 
 h2(#tags). Tags
 

@@ -4,7 +4,7 @@ $plugin['name'] = 'oui_quote';
 
 $plugin['allow_html_help'] = 0;
 
-$plugin['version'] = '0.1.3';
+$plugin['version'] = '0.1.4';
 $plugin['author'] = 'Nicolas Morand';
 $plugin['author_uri'] = 'https://github.com/NicolasGraph';
 $plugin['description'] = 'Display a custom quote or pull one from a web service';
@@ -95,7 +95,7 @@ h2(#requirements). Plugin requirements
 
 oui_quote’s minimum requirements:
 
-* Textpattern 4.5+
+* Textpattern 4.6+
 
 h2(#installation). Installation
 
@@ -104,17 +104,12 @@ h2(#installation). Installation
 
 h2(#prefs). Preferences / options
 
-h3. Txp4.5+
-
 * *Service* — _Default: none_ - The service you want to use to pull the quote;
-* *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
-
-h3. Txp4.6+ only
-
 * *Quote* — _Default: unset_ - The quote in use (automatically filled if a service is selected);
 * *Reference* — _Default: unset_ - The reference of the quote in use (automatically filled by Le Monde only);
 * *Author* — _Default: unset_ - The author of the quote (automatically filled if a service is selected);
 * *Url* — _Default: unset_ - The url of the quote source (automatically filled if a service is selected);
+* *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 
 h2(#tags). Tags
 
@@ -276,9 +271,7 @@ function oui_quote_welcome($evt, $stp)
             oui_quote_install();
             break;
         case 'deleted':
-            function_exists('remove_pref')
-                ? remove_pref(null, 'oui_quote')
-                : safe_delete('txp_prefs', "event='oui_quote'");
+            remove_pref(null, 'oui_quote');
             safe_delete('txp_lang', "name LIKE 'oui\_quote%'");
             break;
     }
@@ -295,7 +288,7 @@ function oui_quote_preflist() {
         'oui_quote_services' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
+            'visibility' => PREF_PLUGIN,
             'widget'     => 'oui_quote_sercices_select',
             'position'   => '10',
             'is_private' => false,
@@ -303,7 +296,7 @@ function oui_quote_preflist() {
         'oui_quote_body' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_HIDDEN,
+            'visibility' => PREF_PLUGIN,
             'widget'     => 'text_input',
             'position'   => '20',
             'is_private' => false,
@@ -311,7 +304,7 @@ function oui_quote_preflist() {
         'oui_quote_author' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_HIDDEN,
+            'visibility' => PREF_PLUGIN,
             'widget'     => 'text_input',
             'position'   => '30',
             'is_private' => false,
@@ -319,7 +312,7 @@ function oui_quote_preflist() {
         'oui_quote_cite' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_HIDDEN,
+            'visibility' => PREF_PLUGIN,
             'widget'     => 'text_input',
             'position'   => '40',
             'is_private' => false,
@@ -327,7 +320,7 @@ function oui_quote_preflist() {
         'oui_quote_url' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_HIDDEN,
+            'visibility' => PREF_PLUGIN,
             'widget'     => 'text_input',
             'position'   => '50',
             'is_private' => false,
@@ -335,7 +328,7 @@ function oui_quote_preflist() {
         'oui_quote_cache_time' => array(
             'value'      => '60',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
+            'visibility' => PREF_PLUGIN,
             'widget'     => 'text_input',
             'position'   => '60',
             'is_private' => false,
@@ -388,7 +381,7 @@ function oui_quote_sercices_select($name, $val) {
  * Jump to the prefs panel.
  */
 function oui_quote_options() {
-    $url = defined('PREF_PLUGIN') ? '?event=prefs' : '?event=prefs&step=advanced_prefs';
+    $url = '?event=prefs';
     header('Location: ' . $url);
 }
 
