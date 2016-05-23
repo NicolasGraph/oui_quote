@@ -37,12 +37,17 @@ h2(#installation). Installation
 
 h2(#prefs). Preferences / options
 
+h3. Txp4.5+
+
 * *Service* — _Default: none_ - The service you want to use to pull the quote;
+* *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
+
+h3. Txp4.6+ only
+
 * *Quote* — _Default: unset_ - The quote in use (automatically filled if a service is selected);
 * *Reference* — _Default: unset_ - The reference of the quote in use (automatically filled by Le Monde only);
 * *Author* — _Default: unset_ - The author of the quote (automatically filled if a service is selected);
 * *Url* — _Default: unset_ - The url of the quote source (automatically filled if a service is selected);
-* *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 
 h2(#tags). Tags
 
@@ -74,7 +79,7 @@ bc. <txp:oui_quote_body />
 
 Displays the body of the quote.
 
-h4. Attributes 
+h4. Attributes
 
 _(Alphabetical order)_
 
@@ -105,7 +110,7 @@ h4. Attributes
 
 _(Alphabetical order)_
 
-* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@. 
+* @class="…"@ — _Default: unset_ - The css class to apply to the HTML tag assigned to @wraptag@.
 * @service="…"@ - _Default: 1 (inherited from the container tag) - display the name/link of the service from which the quote was pulled (usually required, read terms and conditions of use of the service in use);
 * @wraptag="…"@ — _Default: cite_ - The HTML tag to use around the generated content.
 
@@ -123,7 +128,7 @@ bc.. <h1>Citation du jour</h1>
     <figcaption>
         <span>Bernard Werber</span>
         <cite>Le Mystère des dieux (2007) via <a href="http://dicocitations.lemonde.fr/item-5133.html">Le Monde</a></cite>
-    </figcation>    
+    </figcation>
 </figure>
 
 h3(#container_tag). Example 2: container tag use

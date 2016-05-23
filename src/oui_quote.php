@@ -66,6 +66,7 @@ if (0) {
 
 ?>
 # --- BEGIN PLUGIN HELP ---
+
 h1. oui_quote
 
 Easily display your own quote or pull one from the following services:
@@ -103,12 +104,17 @@ h2(#installation). Installation
 
 h2(#prefs). Preferences / options
 
+h3. Txp4.5+
+
 * *Service* — _Default: none_ - The service you want to use to pull the quote;
+* *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
+
+h3. Txp4.6+ only
+
 * *Quote* — _Default: unset_ - The quote in use (automatically filled if a service is selected);
 * *Reference* — _Default: unset_ - The reference of the quote in use (automatically filled by Le Monde only);
 * *Author* — _Default: unset_ - The author of the quote (automatically filled if a service is selected);
 * *Url* — _Default: unset_ - The url of the quote source (automatically filled if a service is selected);
-* *Cache time* — _Default: 60_ - Duration of the cache in minutes; avoid too many external queries.
 
 h2(#tags). Tags
 
@@ -297,7 +303,7 @@ function oui_quote_preflist() {
         'oui_quote_body' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_HIDDEN,
             'widget'     => 'text_input',
             'position'   => '20',
             'is_private' => false,
@@ -305,7 +311,7 @@ function oui_quote_preflist() {
         'oui_quote_author' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_HIDDEN,
             'widget'     => 'text_input',
             'position'   => '30',
             'is_private' => false,
@@ -313,7 +319,7 @@ function oui_quote_preflist() {
         'oui_quote_cite' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_HIDDEN,
             'widget'     => 'text_input',
             'position'   => '40',
             'is_private' => false,
@@ -321,7 +327,7 @@ function oui_quote_preflist() {
         'oui_quote_url' => array(
             'value'      => '',
             'event'      => 'oui_quote',
-            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_ADVANCED,
+            'visibility' => defined('PREF_PLUGIN') ? PREF_PLUGIN : PREF_HIDDEN,
             'widget'     => 'text_input',
             'position'   => '50',
             'is_private' => false,
@@ -446,7 +452,7 @@ function oui_quote_inject_data() {
  * display the content.
  */
 function oui_quote($atts, $thing=null) {
-    global $quote, $author, $cite, $via, $url, $service;
+    global $quote, $by, $cite, $via, $url, $service;
 
     $services = get_pref('oui_quote_services');
     $via = gTxt($services);
@@ -470,13 +476,13 @@ function oui_quote($atts, $thing=null) {
             case 'oui_quote_service_they_said_so':
                 $feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
                 $quote = $feed->contents->quotes[0]->{'quote'};
-                $author = $feed->contents->quotes[0]->{'author'};
+                $by = $feed->contents->quotes[0]->{'author'};
                 $url = 'https://theysaidso.com';
                 break;
             case 'oui_quote_service_quotes_on_design':
                 $feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
                 $quote = strip_tags($feed[0]->{'content'});
-                $author = $feed[0]->{'title'};
+                $by = $feed[0]->{'title'};
                 $url = $feed[0]->{'link'};
                 break;
             case 'oui_quote_service_le_monde':
@@ -485,14 +491,14 @@ function oui_quote($atts, $thing=null) {
                 $feed = preg_split( "/(\[|\])/", strip_tags($feed->channel->item->description));
                 $quote = $feed[0];
                 $cite = $feed[2];
-                $author = $feed[1];
+                $by = $feed[1];
                 break;
             case 'oui_quote_service_le_figaro':
                 $feed = simplexml_load_string(file_get_contents('http://evene.lefigaro.fr/rss/citation_jour.xml'));
                 $url = $feed->channel->item->link;
                 $feed = preg_split( "/ - /", strip_tags($feed->channel->item->title));
                 $quote = $feed[1];
-                $author = $feed[0];
+                $by = $feed[0];
                 break;
 
             update_lastmod();
@@ -503,7 +509,7 @@ function oui_quote($atts, $thing=null) {
             // Time stamp and store the new data in the prefs.
             set_pref('oui_quote_cache_set', $now);
             !$quote ?: set_pref('oui_quote_body', $quote);
-            !$author ?: set_pref('oui_quote_author', $author);
+            !$by ?: set_pref('oui_quote_author', $by);
             !$cite ?: set_pref('oui_quote_cite', $cite);
             !$url ?: set_pref('oui_quote_url', $url);
         }
@@ -512,7 +518,7 @@ function oui_quote($atts, $thing=null) {
     } else {
         $quote = get_pref('oui_quote_body');
         $cite = get_pref('oui_quote_cite');
-        $author = get_pref('oui_quote_author');
+        $by = get_pref('oui_quote_author');
         $url = get_pref('oui_quote_url');
     }
 
@@ -522,7 +528,7 @@ function oui_quote($atts, $thing=null) {
             ? $reference = '<br /><cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>'
             : $reference = ($cite ? '<br /><cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
 
-        $data = '<blockquote>'.$quote.'</blockquote>'.n.'<figcaption>'.$author.n.$reference.'</figcaption>';
+        $data = '<blockquote>'.$quote.'</blockquote>'.n.'<figcaption>'.$by.n.$reference.'</figcaption>';
 
     } else {
 
@@ -570,14 +576,14 @@ function oui_quote_cite($atts) {
  * Display the author of the quote.
  */
 function oui_quote_author($atts) {
-    global $author;
+    global $by;
 
     extract(lAtts(array(
         'class'   => '',
         'wraptag' => 'span',
     ),$atts));
 
-    return ($wraptag) ? doTag($author, $wraptag, $class) : $author;
+    return ($wraptag) ? doTag($by, $wraptag, $class) : $by;
 }
 # --- END PLUGIN CODE ---
 
