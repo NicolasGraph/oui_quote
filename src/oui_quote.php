@@ -4,7 +4,7 @@ $plugin['name'] = 'oui_quote';
 
 $plugin['allow_html_help'] = 0;
 
-$plugin['version'] = '0.1.4';
+$plugin['version'] = '0.1.5-dev';
 $plugin['author'] = 'Nicolas Morand';
 $plugin['author_uri'] = 'https://github.com/NicolasGraph';
 $plugin['description'] = 'Display a custom quote or pull one from a web service';
@@ -26,7 +26,7 @@ $plugin['flags'] = 3;
 $plugin['textpack'] = <<< EOT
 #@public
 #@language en-gb
-oui_quote => Quote
+oui_quote => Quote (oui_quote)
 oui_quote_services => Service
 oui_quote_body => Quote
 oui_quote_cite => Reference
@@ -42,7 +42,7 @@ oui_quote_service_le_monde => Le Monde
 oui_quote_le_figaro => Quote of the day from Le Figaro (fr)
 oui_quote_service_le_figaro => Le Figaro
 #@language fr-fr
-oui_quote => Citation
+oui_quote => Citation (oui_quote)
 oui_quote_services => Service
 oui_quote_body => Citation
 oui_quote_cite => Référence
@@ -221,15 +221,13 @@ This plugin is distributed under "GPLv2":http://www.gnu.org/licenses/gpl-2.0.fr.
 # --- BEGIN PLUGIN CODE ---
 
 /**
- * Register tags for Txp 4.6+.
+ * Register tags.
  */
-if (class_exists('\Textpattern\Tag\Registry')) {
-    Txp::get('\Textpattern\Tag\Registry')
-        ->register('oui_quote')
-        ->register('oui_quote_body')
-        ->register('oui_quote_cite')
-        ->register('oui_quote_author');
-}
+Txp::get('\Textpattern\Tag\Registry')
+    ->register('oui_quote')
+    ->register('oui_quote_body')
+    ->register('oui_quote_cite')
+    ->register('oui_quote_author');
 
 /**
  * Register callbacks.
@@ -381,7 +379,7 @@ function oui_quote_sercices_select($name, $val) {
  * Jump to the prefs panel.
  */
 function oui_quote_options() {
-    $url = '?event=prefs';
+    $url = '?event=prefs#prefs_group_oui_quote';
     header('Location: ' . $url);
 }
 
