@@ -1,4 +1,4 @@
-h1. oui_quote <img src="https://img.shields.io/badge/textpattern-4.6+-brightgreen.svg" /> <img src="https://img.shields.io/github/release/NicolasGraph/oui_quote.svg" />
+h1. oui_quote
 
 Easily display your own quote or pull one from the following services:
 * "Le Figaro":http://evene.lefigaro.fr/citations (fr).
