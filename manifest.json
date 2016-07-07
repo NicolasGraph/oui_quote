@@ -1,0 +1,11 @@
+{
+    "name"        : "oui_quote",
+    "description" : "Display a custom quote or pull one from a web service",
+    "version"     : "0.1.5-dev",
+    "type"        : 0,
+    "author"      : "Nicolas Morand",
+    "author_uri"  : "http://github.com/NicolasGraph",
+    "order"       : 5,
+    "flags"       : 3,
+    "help"        : {"file" : ["./README.textile"]}
+}

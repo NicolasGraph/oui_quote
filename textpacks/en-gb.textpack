@@ -1,0 +1,17 @@
+#@admin
+#@language en-gb
+oui_quote => Quote (oui_quote)
+oui_quote_services => Service
+oui_quote_body => Quote
+oui_quote_cite => Reference
+oui_quote_author => Author
+oui_quote_url => Url
+oui_quote_cache_time => Cache time in minutes
+oui_quote_quotes_on_design => Random quote from Quotes on Design (en)
+oui_quote_service_quotes_on_design => Quotes on Design
+oui_quote_they_said_so => Quote of the day from They Said So (en)
+oui_quote_service_they_said_so => They Said So
+oui_quote_le_monde => Quote of the day from Le Monde (fr)
+oui_quote_service_le_monde => Le Monde
+oui_quote_le_figaro => Quote of the day from Le Figaro (fr)
+oui_quote_service_le_figaro => Le Figaro

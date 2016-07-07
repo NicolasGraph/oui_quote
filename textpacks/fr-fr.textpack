@@ -1,0 +1,17 @@
+#@admin
+#@language fr-fr
+oui_quote => Citation (oui_quote)
+oui_quote_services => Service
+oui_quote_body => Citation
+oui_quote_cite => Référence
+oui_quote_author => Author
+oui_quote_url => Url
+oui_quote_cache_time => Durée du cache en minutes
+oui_quote_quotes_on_design => Citation aléatoire de Quotes on Design (en)
+oui_quote_service_quotes_on_design => Quotes on Design
+oui_quote_they_said_so => Citation du jour de They Said So (en)
+oui_quote_service_they_said_so => They Said So
+oui_quote_le_monde => Citation du jour du Monde (fr)
+oui_quote_service_le_monde => Le Monde
+oui_quote_le_figaro => Citation du jour du Figaro (fr)
+oui_quote_service_le_figaro => Le Figaro
