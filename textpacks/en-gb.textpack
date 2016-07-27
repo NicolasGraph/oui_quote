@@ -1,5 +1,5 @@
 #@admin
-#@language en-gb
+#Default language, en-us, en-gb
 oui_quote => Quote (oui_quote)
 oui_quote_services => Service
 oui_quote_body => Quote
