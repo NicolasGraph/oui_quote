@@ -13,7 +13,6 @@ Txp::get('\Textpattern\Tag\Registry')
  * Register callbacks.
  */
 if (txpinterface === 'admin') {
-
     add_privs('prefs.oui_quote', '1');
     add_privs('plugin_prefs.oui_quote', '1');
 
@@ -31,7 +30,8 @@ if (txpinterface === 'admin') {
 /**
  * Get external popHelp contents
  */
-function oui_quote_pophelp($evt, $stp, $ui, $vars) {
+function oui_quote_pophelp($evt, $stp, $ui, $vars)
+{
     return str_replace(HELP_URL, 'http://help.ouisource.com/', $ui);
 }
 
@@ -61,7 +61,8 @@ function oui_quote_welcome($evt, $stp)
  * PREF_PLUGIN for 4.5
  * PREF_ADVANCED for 4.6+
  */
-function oui_quote_preflist() {
+function oui_quote_preflist()
+{
     $prefList = array(
         'oui_quote_services' => array(
             'value'      => '',
@@ -123,8 +124,8 @@ function oui_quote_preflist() {
     return $prefList;
 }
 
-function oui_quote_install() {
-
+function oui_quote_install()
+{
     $prefList = oui_quote_preflist();
 
     foreach ($prefList as $pref => $options) {
@@ -145,7 +146,8 @@ function oui_quote_install() {
 /**
  * Set Services pref function using selectInput()
  */
-function oui_quote_sercices_select($name, $val) {
+function oui_quote_sercices_select($name, $val)
+{
     $vals = array(
         'oui_quote_service_quotes_on_design' => gTxt('oui_quote_quotes_on_design'),
         'oui_quote_service_they_said_so' => gTxt('oui_quote_they_said_so'),
@@ -158,7 +160,8 @@ function oui_quote_sercices_select($name, $val) {
 /**
  * Jump to the prefs panel.
  */
-function oui_quote_options() {
+function oui_quote_options()
+{
     $url = '?event=prefs#prefs_group_oui_quote';
     header('Location: ' . $url);
 }
@@ -170,12 +173,20 @@ function oui_quote_options() {
  * or the quote field is empty;
  * or the cache is outdated.
  */
-function oui_quote_inject_data() {
+function oui_quote_inject_data()
+{
+    $serviceChanged = $_POST['oui_quote_services'] !== get_pref('oui_quote_services');
+    $cacheOutdated = (time() - get_pref('oui_quote_cache_set')) > ($_POST['oui_quote_cache_time'] * 60);
 
-    if (($_POST['oui_quote_services'] !== get_pref('oui_quote_services')) || (!get_pref('oui_quote_body') || (time() - get_pref('oui_quote_cache_set')) > ($_POST['oui_quote_cache_time'] * 60))) {
+    if ($serviceChanged || $cacheOutdated || (!get_pref('oui_quote_body'))) {
         switch ($_POST['oui_quote_services']) {
             case 'oui_quote_service_they_said_so':
-                unset($_POST['oui_quote_body'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_url']);
+                unset(
+                    $_POST['oui_quote_body'],
+                    $_POST['oui_quote_cite'],
+                    $_POST['oui_quote_author'],
+                    $_POST['oui_quote_url']
+                );
                 $feed = json_decode(file_get_contents('http://quotes.rest/qod.json'));
                 set_pref('oui_quote_body', $feed->contents->quotes[0]->{'quote'});
                 set_pref('oui_quote_cite', '');
@@ -183,27 +194,46 @@ function oui_quote_inject_data() {
                 set_pref('oui_quote_url', 'https://theysaidso.com');
                 break;
             case 'oui_quote_service_quotes_on_design':
-                unset($_POST['oui_quote_body'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_url']);
-                $feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
+                unset(
+                    $_POST['oui_quote_body'],
+                    $_POST['oui_quote_cite'],
+                    $_POST['oui_quote_author'],
+                    $_POST['oui_quote_url']
+                );
+                $feed = json_decode(
+                    file_get_contents(
+                        'http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'
+                    )
+                );
                 set_pref('oui_quote_body', strip_tags($feed[0]->{'content'}));
                 set_pref('oui_quote_cite', '');
                 set_pref('oui_quote_author', $feed[0]->{'title'});
                 set_pref('oui_quote_url', $feed[0]->{'link'});
                 break;
             case 'oui_quote_service_le_monde':
-                unset($_POST['oui_quote_body'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_url']);
+                unset(
+                    $_POST['oui_quote_body'],
+                    $_POST['oui_quote_cite'],
+                    $_POST['oui_quote_author'],
+                    $_POST['oui_quote_url']
+                );
                 $feed = simplexml_load_string(file_get_contents('http://dicocitations.lemonde.fr/xml-rss2.php'));
                 set_pref('oui_quote_url', $feed->channel->item->link);
-                $feed = preg_split( "/(\[|\])/", strip_tags($feed->channel->item->description));
+                $feed = preg_split("/(\[|\])/", strip_tags($feed->channel->item->description));
                 set_pref('oui_quote_body', trim($feed[0]));
                 set_pref('oui_quote_cite', trim($feed[2]));
                 set_pref('oui_quote_author', trim($feed[1]));
                 break;
             case 'oui_quote_service_le_figaro':
-                unset($_POST['oui_quote_body'], $_POST['oui_quote_cite'], $_POST['oui_quote_author'], $_POST['oui_quote_url']);
+                unset(
+                    $_POST['oui_quote_body'],
+                    $_POST['oui_quote_cite'],
+                    $_POST['oui_quote_author'],
+                    $_POST['oui_quote_url']
+                );
                 $feed = simplexml_load_string(file_get_contents('http://evene.lefigaro.fr/rss/citation_jour.xml'));
                 set_pref('oui_quote_url', $feed->channel->item->link);
-                $feed = preg_split( "/ - /", strip_tags($feed->channel->item->title));
+                $feed = preg_split("/ - /", strip_tags($feed->channel->item->title));
                 set_pref('oui_quote_body', $feed[1]);
                 set_pref('oui_quote_cite', '');
                 set_pref('oui_quote_author', $feed[0]);
@@ -222,7 +252,8 @@ function oui_quote_inject_data() {
  * store data in the prefs fields;
  * display the content.
  */
-function oui_quote($atts, $thing=null) {
+function oui_quote($atts, $thing = null)
+{
     global $quote, $by, $cite, $via, $url, $service;
 
     $services = get_pref('oui_quote_services');
@@ -234,7 +265,7 @@ function oui_quote($atts, $thing=null) {
         'class'      => '',
         'label'      => '',
         'labeltag'   => '',
-    ),$atts));
+    ), $atts));
 
     $cache_time = get_pref('oui_quote_cache_time');
     $now = time();
@@ -251,7 +282,11 @@ function oui_quote($atts, $thing=null) {
                 $url = 'https://theysaidso.com';
                 break;
             case 'oui_quote_service_quotes_on_design':
-                $feed = json_decode(file_get_contents('http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'));
+                $feed = json_decode(
+                    file_get_contents(
+                        'http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1'
+                    )
+                );
                 $quote = strip_tags($feed[0]->{'content'});
                 $by = $feed[0]->{'title'};
                 $url = $feed[0]->{'link'};
@@ -259,7 +294,7 @@ function oui_quote($atts, $thing=null) {
             case 'oui_quote_service_le_monde':
                 $feed = simplexml_load_string(file_get_contents('http://dicocitations.lemonde.fr/xml-rss2.php'));
                 $url = $feed->channel->item->link;
-                $feed = preg_split( "/(\[|\])/", strip_tags($feed->channel->item->description));
+                $feed = preg_split("/(\[|\])/", strip_tags($feed->channel->item->description));
                 $quote = $feed[0];
                 $cite = $feed[2];
                 $by = $feed[1];
@@ -267,7 +302,7 @@ function oui_quote($atts, $thing=null) {
             case 'oui_quote_service_le_figaro':
                 $feed = simplexml_load_string(file_get_contents('http://evene.lefigaro.fr/rss/citation_jour.xml'));
                 $url = $feed->channel->item->link;
-                $feed = preg_split( "/ - /", strip_tags($feed->channel->item->title));
+                $feed = preg_split("/ - /", strip_tags($feed->channel->item->title));
                 $quote = $feed[1];
                 $by = $feed[0];
                 break;
@@ -294,17 +329,13 @@ function oui_quote($atts, $thing=null) {
     }
 
     if ($thing === null) {
-
         $service
             ? $reference = '<br /><cite>'.($cite ? $cite : '').' via '.($url ? href($via, $url) : $via).'</cite>'
             : $reference = ($cite ? '<br /><cite>'.($url ? href($cite, $url) : $cite).'</cite>' : '');
 
         $data = '<blockquote>'.$quote.'</blockquote>'.n.'<figcaption>'.$by.n.$reference.'</figcaption>';
-
     } else {
-
         $data = parse($thing);
-
     }
 
     return (($label) ? doLabel($label, $labeltag) : '').n.doTag($data, $wraptag, $class);
@@ -313,13 +344,14 @@ function oui_quote($atts, $thing=null) {
 /**
  * Display the body of the quote.
  */
-function oui_quote_body($atts) {
+function oui_quote_body($atts)
+{
     global $quote;
 
     extract(lAtts(array(
         'class'   => '',
         'wraptag' => 'blockquote',
-    ),$atts));
+    ), $atts));
 
     return ($wraptag) ? doTag($quote, $wraptag, $class) : $quote;
 }
@@ -327,14 +359,15 @@ function oui_quote_body($atts) {
 /**
  * Display the reference of the quote.
  */
-function oui_quote_cite($atts) {
+function oui_quote_cite($atts)
+{
     global $cite, $via, $url, $service;
 
     extract(lAtts(array(
         'service' => $service,
         'class'   => '',
         'wraptag' => 'cite',
-    ),$atts));
+    ), $atts));
 
     $service == 1
         ? $reference = ($cite ? $cite : '').' via '.($url ? href($via, $url) : $via)
@@ -346,13 +379,14 @@ function oui_quote_cite($atts) {
 /**
  * Display the author of the quote.
  */
-function oui_quote_author($atts) {
+function oui_quote_author($atts)
+{
     global $by;
 
     extract(lAtts(array(
         'class'   => '',
         'wraptag' => 'span',
-    ),$atts));
+    ), $atts));
 
     return ($wraptag) ? doTag($by, $wraptag, $class) : $by;
 }
