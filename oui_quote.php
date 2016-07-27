@@ -162,8 +162,7 @@ function oui_quote_sercices_select($name, $val)
  */
 function oui_quote_options()
 {
-    $url = '?event=prefs#prefs_group_oui_quote';
-    header('Location: ' . $url);
+    header('Location: ?event=prefs#prefs_group_oui_quote');
 }
 
 /**
